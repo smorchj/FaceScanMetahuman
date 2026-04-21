@@ -123,14 +123,16 @@ export function procrustesAlign(sourcePts, targetPts) {
   const R = d >= 0
     ? mul3(transpose3(Vt), transpose3(U))
     : mul3(transpose3(Vt), mul3([1,0,0, 0,1,0, 0,0,-1], transpose3(U)));
-  // Uniform scale: sum of singular values / variance of centered source.
-  let varS = 0;
+  // Uniform scale (Umeyama 1991): the thing being scaled is the TARGET
+  // argument (applyRigid maps target -> source), so the denominator is
+  // the variance of the target points, not the source.
+  let varT = 0;
   for (let i = 0; i < n; i++) {
-    varS += sCentered[i][0]*sCentered[i][0]
-          + sCentered[i][1]*sCentered[i][1]
-          + sCentered[i][2]*sCentered[i][2];
+    varT += tCentered[i][0]*tCentered[i][0]
+          + tCentered[i][1]*tCentered[i][1]
+          + tCentered[i][2]*tCentered[i][2];
   }
-  const scale = varS > EPS ? (S[0] + S[1] + S[2]) / varS : 1;
+  const scale = varT > EPS ? (S[0] + S[1] + S[2]) / varT : 1;
 
   const translate = [
     sC[0] - scale * (R[0]*tC[0] + R[1]*tC[1] + R[2]*tC[2]),
