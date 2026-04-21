@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+
+# GLB assets are big; expect users to point at their own via ?glb=
+samples/*.glb
+!samples/.gitkeep
+
+# Tool output artifacts
+*.anchor-out.json

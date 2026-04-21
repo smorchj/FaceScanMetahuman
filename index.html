@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FaceScanMetahuman — anchor picker</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b0d11; color: #d8dae0;
+      font: 14px/1.4 system-ui, sans-serif; }
+    body { display: grid; grid-template-columns: 1fr 320px; }
+    #stage { min-height: 100vh; }
+    #sidebar {
+      padding: 16px; background: #111318;
+      font: 13px/1.45 system-ui, sans-serif; overflow-y: auto; max-height: 100vh;
+    }
+    #sidebar h2 { font-size: 14px; margin: 0 0 8px; color: #fff; }
+    #sidebar .current {
+      padding: 10px 12px; margin: 8px 0; border-radius: 6px;
+      background: #1f2a44; color: #9cd1ff; font-size: 15px; font-weight: 600;
+    }
+    #sidebar .hint { color: #8a90a0; font-size: 12px; margin-bottom: 12px; }
+    #sidebar ol { list-style: none; padding: 0; margin: 0; }
+    #sidebar li {
+      padding: 4px 8px; margin: 2px 0; border-radius: 4px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    #sidebar li:hover { background: #1a1d25; }
+    #sidebar li.done { color: #6c7a92; }
+    #sidebar li.done::after { content: '✓'; color: #6ece6a; }
+    #sidebar li.active { background: #2a3560; color: #fff; }
+    #sidebar .actions { display: flex; gap: 8px; margin: 12px 0; }
+    #sidebar button {
+      padding: 8px 12px; border: 0; border-radius: 4px; cursor: pointer;
+      background: #2a3560; color: #fff; font: inherit;
+    }
+    #sidebar button:hover { background: #3a4780; }
+    #sidebar button.secondary { background: #2a2d36; }
+    #sidebar .mesh-info { font-size: 11px; color: #6c7a92; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <aside id="sidebar">
+    <h2>MetaHuman anchor picker</h2>
+    <div class="hint">
+      Click the point on the MetaHuman's face that matches the current
+      landmark. Right-click-drag to orbit, scroll to zoom, shift-drag to
+      pan. Click an item below to jump to it. Left/right pairs are
+      auto-mirrored across the face's local X=0 plane.
+    </div>
+    <div class="current" id="current">select a landmark</div>
+    <div class="actions">
+      <button id="prev">&larr; Prev</button>
+      <button id="next">Next &rarr;</button>
+      <button id="clear" class="secondary">Clear current</button>
+    </div>
+    <div class="actions">
+      <button id="download">Download JSON</button>
+      <button id="load" class="secondary">Load existing</button>
+      <input id="loadFile" type="file" accept="application/json" hidden />
+    </div>
+    <ol id="list"></ol>
+    <div class="mesh-info" id="meshInfo"></div>
+  </aside>
+
+  <script type="module">
+    import { start } from './src/picker.js';
+    const params = new URLSearchParams(location.search);
+    const glbUrl = params.get('glb') || 'samples/metahuman.glb';
+    const characterId = params.get('id') || glbUrl.split('/').pop().replace(/\.glb$/i, '');
+    start({
+      stage: document.getElementById('stage'),
+      glbUrl,
+      characterId,
+    }).catch((err) => {
+      console.error('[picker] failed', err);
+      document.getElementById('stage').innerHTML =
+        '<pre style="color:#f88;padding:16px">' + (err && err.message || err) +
+        '<br><br>Pass a MetaHuman GLB via ?glb=path/to/file.glb</pre>';
+    });
+  </script>
+</body>
+</html>
