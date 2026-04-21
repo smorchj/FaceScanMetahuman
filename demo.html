@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FaceScanMetahuman — one-shot warp demo</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b0d11; color: #d8dae0;
+      font: 13px/1.45 system-ui, sans-serif; }
+    body { display: grid; grid-template-columns: 1fr 360px; }
+    #stage { min-height: 100vh; }
+    #side { padding: 16px; background: #111318; overflow-y: auto; max-height: 100vh; }
+    #side h2 { font-size: 14px; margin: 0 0 8px; color: #fff; }
+    #side p { color: #8a90a0; margin: 0 0 12px; }
+    video, #overlay {
+      width: 100%; height: auto; aspect-ratio: 4/3; background: #000;
+      border-radius: 6px; display: block; transform: scaleX(-1);
+    }
+    .videoWrap { position: relative; margin: 10px 0; }
+    #overlay {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    button {
+      padding: 10px 14px; border: 0; border-radius: 4px; cursor: pointer;
+      background: #2a3560; color: #fff; font: inherit; font-weight: 600;
+      width: 100%; margin-top: 8px;
+    }
+    button:hover { background: #3a4780; }
+    button.secondary { background: #2a2d36; font-weight: 400; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    #status {
+      margin-top: 10px; padding: 8px 10px; border-radius: 4px;
+      background: #1a1d25; color: #9cd1ff; font-size: 12px; min-height: 32px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <aside id="side">
+    <h2>One-shot identity warp</h2>
+    <p>Loads a MetaHuman, watches your face with MediaPipe, warps the
+       MH neutral toward your proportions on demand. First real test of
+       the pipeline end-to-end. No texture, no live update.</p>
+    <div class="videoWrap">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+    </div>
+    <button id="capture" disabled>Capture and warp</button>
+    <button id="reset" class="secondary">Reset to rest</button>
+    <div id="status">loading...</div>
+  </aside>
+
+  <script type="module">
+    import { start } from './src/demo.js';
+    const params = new URLSearchParams(location.search);
+    start({
+      stage:       document.getElementById('stage'),
+      video:       document.getElementById('video'),
+      overlay:     document.getElementById('overlay'),
+      captureBtn:  document.getElementById('capture'),
+      resetBtn:    document.getElementById('reset'),
+      statusEl:    document.getElementById('status'),
+      glbUrl:      params.get('glb')     || 'samples/ada/ada.glb',
+      anchorsUrl:  params.get('anchors') || 'samples/ada/anchors.json',
+    }).catch((err) => {
+      console.error('[demo] failed', err);
+      document.getElementById('status').textContent = 'failed: ' + (err.message || err);
+    });
+  </script>
+</body>
+</html>
