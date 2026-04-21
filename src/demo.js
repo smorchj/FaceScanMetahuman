@@ -130,12 +130,14 @@ export async function start(opts) {
 // --- core warp step ---
 
 function runWarp(mpLandmarks, anchors, skin, restPositions) {
-  // MediaPipe normalized landmarks (x,y in [0,1], z in a relative scale
-  // where negative is toward camera). Flip X so subject-left stays on
-  // the subject-left side in MH space. Flip Y so up is +Y.
+  // MediaPipe normalized landmarks vs MH world:
+  //   MP raw +X = image right  = subject-left  = MH +X   (no flip)
+  //   MP raw +Y = image down                   = MH -Y   (flip)
+  //   MP raw +Z = into screen  = away from cam = MH -Z   (flip)
+  // The video element's CSS mirror does not change MP's input pixels.
   const mpAnchors = anchors.map((a) => {
     const l = mpLandmarks[a.mpIdx];
-    return [-(l.x - 0.5), -(l.y - 0.5), -l.z];
+    return [l.x - 0.5, -(l.y - 0.5), -l.z];
   });
   const mhAnchors = anchors.map((a) => a.mhRest);
 
