@@ -148,25 +148,56 @@ export async function start(opts) {
 
   // Per-FOV cache of auto-generated anchors is declared above the
   // tick loop so the overlay can use whichever set is active.
+  // Multi-frame capture: over CAPTURE_MS seconds, sample the user's
+  // rigid-aligned MP targets every SAMPLE_MS and average per-anchor
+  // after the window closes. User is expected to slowly rotate their
+  // head during capture; multi-angle averaging mitigates the
+  // single-frame bias where chin-up vs chin-down give different shapes.
+  const CAPTURE_MS = 3000;
+  const SAMPLE_MS = 100;
   captureBtn.addEventListener('click', async () => {
     if (!latest) { setStatus('no face detected right now'); return; }
     if (!latestMatrix) { setStatus('no facial matrix yet; wait a beat and retry'); return; }
     captureBtn.disabled = true;
     try {
+      // Lock in FOV + anchor set on first valid frame.
       const fovDeg = estimateWebcamFovDeg(latest, latestMatrix);
-      setStatus('estimated webcam FOV: ' + fovDeg.toFixed(1) + '°');
       if (!cachedAnchors || Math.abs(fovDeg - cachedFovDeg) > 3) {
-        setStatus('FOV changed to ' + fovDeg.toFixed(1) + '°; rebuilding anchors on Ada...');
+        setStatus('FOV ' + fovDeg.toFixed(1) + '°; rebuilding anchors on Ada...');
         cachedAnchors = await buildAnchorsAtFov(three, skin, imgLandmarker, fovDeg);
         cachedFovDeg = fovDeg;
-        setStatus('anchors built at FOV ' + fovDeg.toFixed(1) + '° ('
-                  + cachedAnchors.length + ' mapped). Warping...');
       }
-      const warpStats = runWarp(latest, cachedAnchors, warpTargets);
+
+      const samples = [];
+      const startT = performance.now();
+      await new Promise((resolve) => {
+        const id = setInterval(() => {
+          const elapsed = performance.now() - startT;
+          if (elapsed >= CAPTURE_MS) { clearInterval(id); resolve(); return; }
+          const remaining = ((CAPTURE_MS - elapsed) / 1000).toFixed(1);
+          setStatus('capturing... ' + remaining + 's left, '
+                    + samples.length + ' samples.\n'
+                    + 'Slowly turn your head: up, down, left, right.');
+          if (latest && latestMatrix) {
+            samples.push(computeAlignedTargets(latest, cachedAnchors));
+          }
+        }, SAMPLE_MS);
+      });
+
+      if (!samples.length) {
+        setStatus('no valid frames captured');
+        captureBtn.disabled = false;
+        return;
+      }
+
+      // Per-anchor average across samples.
+      const avgTargets = averageSamples(samples);
+      const warpStats = runWarpFromTargets(avgTargets, cachedAnchors, warpTargets);
       setStatus(
         'warp applied.\n' +
         'FOV: ' + cachedFovDeg.toFixed(1) + '°\n' +
         'anchors: ' + warpStats.n + '\n' +
+        'samples averaged: ' + samples.length + '\n' +
         'mean anchor residual: ' + warpStats.meanResidual.toFixed(5) + ' m\n' +
         'mean vertex delta:    ' + warpStats.meanDelta.toFixed(5) + ' m'
       );
@@ -227,21 +258,47 @@ function collectHeadMeshes(root) {
 
 // --- core warp step ---
 
-function runWarp(mpLandmarks, anchors, warpTargets) {
+// Per-anchor average of aligned targets across N frames. Each sample
+// is an array of [x,y,z] per anchor. Output is same-shape averaged.
+function averageSamples(samples) {
+  const n = samples[0].length;
+  const out = new Array(n);
+  for (let i = 0; i < n; i++) {
+    let sx = 0, sy = 0, sz = 0;
+    for (const s of samples) {
+      sx += s[i][0]; sy += s[i][1]; sz += s[i][2];
+    }
+    const k = samples.length;
+    out[i] = [sx / k, sy / k, sz / k];
+  }
+  return out;
+}
+
+// Compute the rigid-aligned MP target positions for one frame. Target
+// i is "where the RBF should pull rest_anchor i to match this frame
+// of the user." Multi-frame capture averages these across N frames
+// before solving the warp.
+function computeAlignedTargets(mpLandmarks, anchors) {
   // MediaPipe normalized landmarks vs MH world:
   //   MP raw +X = image right  = subject-left  = MH +X   (no flip)
   //   MP raw +Y = image down                   = MH -Y   (flip)
   //   MP raw +Z = into screen  = away from cam = MH -Z   (flip)
-  // The video element's CSS mirror does not change MP's input pixels.
   const mpAnchors = anchors.map((a) => {
     const l = mpLandmarks[a.mpIdx];
     return [l.x - 0.5, -(l.y - 0.5), -l.z];
   });
   const mhAnchors = anchors.map((a) => a.mhRest);
-
-  // Align MP into MH space (rigid + uniform scale).
   const rigid = procrustesAlign(mhAnchors, mpAnchors);
-  const alignedTargets = mpAnchors.map((p) => applyRigid(rigid, p, [0, 0, 0]));
+  return mpAnchors.map((p) => applyRigid(rigid, p, [0, 0, 0]));
+}
+
+function runWarp(mpLandmarks, anchors, warpTargets) {
+  const alignedTargets = computeAlignedTargets(mpLandmarks, anchors);
+  return runWarpFromTargets(alignedTargets, anchors, warpTargets);
+}
+
+function runWarpFromTargets(alignedTargets, anchors, warpTargets) {
+  const mhAnchors = anchors.map((a) => a.mhRest);
 
   // Solve the RBF from MH rest -> aligned MP targets.
   const warp = solveWarp(mhAnchors, alignedTargets);
