@@ -6,6 +6,7 @@
 // live update. The goal is to see "that looks like me-ish" and move on.
 
 import * as THREE from 'three';
+import Delaunator from 'https://cdn.skypack.dev/delaunator@5.0.1';
 import { mount } from './viewer.js';
 
 import { MP_INDICES } from './mp_indices.js';
@@ -180,6 +181,7 @@ export async function start(opts) {
   let captureLoopId = null;
   let cachedMpToMh = null;           // rigid+scale MP canonical -> MH rest
   let cachedAdaLmRaw = null;         // Ada's 478 landmarks (head-on)
+  let cachedTriangles = null;        // array of [a,b,c] anchor-index triples
   const USER_SMOOTH_N = 6;           // running-average window for user lattice
   let userRecent = [];               // array of raw user 478-landmark arrays
   let userQuatRef = null;            // user head quat at start, = "head-on" baseline
@@ -199,7 +201,21 @@ export async function start(opts) {
       for (const a of cachedAnchors) {
         a.uv = uvAttr ? [uvAttr.getX(a.mhIdx), uvAttr.getY(a.mhIdx)] : null;
       }
-      setStatus('anchors: ' + cachedAnchors.length + '. capturing live...');
+      // Triangulate the anchor UVs. Delaunator wants a flat [x0,y0,x1,y1,...]
+      // of 2D points. We use UV space because that is where we ultimately
+      // paint; the same topology is reused for sampling webcam pixels.
+      const flat = [];
+      for (const a of cachedAnchors) {
+        flat.push(a.uv[0], a.uv[1]);
+      }
+      const d = new Delaunator(flat);
+      cachedTriangles = [];
+      for (let i = 0; i < d.triangles.length; i += 3) {
+        cachedTriangles.push([d.triangles[i], d.triangles[i + 1], d.triangles[i + 2]]);
+      }
+      setStatus('anchors: ' + cachedAnchors.length
+                + ', triangles: ' + cachedTriangles.length
+                + '. capturing live...');
     }
     userRecent = [];
     userQuatRef = null;
@@ -258,11 +274,11 @@ export async function start(opts) {
       );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
 
-      // Paint webcam pixels onto the face texture at visible anchors.
-      if (faceTex) {
-        paintFaceTextureFromWebcam(
+      // Project the webcam onto the face texture via triangle warp.
+      if (faceTex && cachedTriangles) {
+        projectWebcamTriangles(
           faceTex, video, sampleCanvas, sampleCtx,
-          latest, cachedAnchors, cachedAdaLmRaw, userDeltaQuat,
+          latest, cachedAnchors, cachedTriangles,
         );
       }
 
@@ -381,13 +397,15 @@ function anchorFacesCamera(anchor, userQuat, cachedAdaLmRaw) {
   return v.z > 0.01;
 }
 
-// Paint current webcam pixels into the dynamic face texture at each
-// visible anchor's UV. Brush radius and alpha are tuned for dense
-// anchor layouts; with ~400 anchors the brushes overlap enough to
-// fill the face without visible holes after a few seconds of capture.
-function paintFaceTextureFromWebcam(
+// Project webcam pixels into the dynamic face texture, one affine
+// triangle at a time. For each triangle of the anchor Delaunay
+// triangulation we warp the corresponding webcam region into the UV
+// region bounded by the triangle's three UV corners. Fills the whole
+// face in one pass; blank regions only remain where triangles are
+// back-facing (skipped) or outside the face mesh (no anchors there).
+function projectWebcamTriangles(
   faceTex, video, sampleCanvas, sampleCtx,
-  userLm, anchors, adaRaw, userDeltaQuat,
+  userLm, anchors, triangles,
 ) {
   if (!video.videoWidth) return;
   if (sampleCanvas.width !== video.videoWidth
@@ -396,36 +414,71 @@ function paintFaceTextureFromWebcam(
     sampleCanvas.height = video.videoHeight;
   }
   sampleCtx.drawImage(video, 0, 0);
-  const { canvas, ctx, size } = faceTex;
+  const { ctx, size, texture } = faceTex;
+  const W = sampleCanvas.width, H = sampleCanvas.height;
 
-  const BRUSH = 10;
-  const ALPHA = 0.6;
-  ctx.globalAlpha = ALPHA;
+  for (const [ia, ib, ic] of triangles) {
+    const a = anchors[ia], b = anchors[ib], c = anchors[ic];
+    const la = userLm[a.mpIdx], lb = userLm[b.mpIdx], lc = userLm[c.mpIdx];
+    if (!la || !lb || !lc) continue;
 
-  for (const a of anchors) {
-    if (!a.uv) continue;
-    if (!anchorFacesCamera(a, userDeltaQuat, adaRaw)) continue;
-    const lm = userLm[a.mpIdx];
-    if (!lm) continue;
-    const sx = Math.floor(lm.x * sampleCanvas.width);
-    const sy = Math.floor(lm.y * sampleCanvas.height);
-    if (sx < 0 || sy < 0 || sx >= sampleCanvas.width || sy >= sampleCanvas.height) continue;
-    const pix = sampleCtx.getImageData(sx, sy, 1, 1).data;
-    ctx.fillStyle = 'rgb(' + pix[0] + ',' + pix[1] + ',' + pix[2] + ')';
+    const sx1 = la.x * W, sy1 = la.y * H;
+    const sx2 = lb.x * W, sy2 = lb.y * H;
+    const sx3 = lc.x * W, sy3 = lc.y * H;
 
-    // glTF UV: u across, v down from top. CanvasTexture with flipY=false
-    // treats canvas (0,0)=top-left as UV (0,1). Canvas y = v * size.
-    // Ada's map was imported with flipY matching her original; we
-    // inherit it in initFaceTexture so we can paint directly at
-    // (u*size, v*size) without an extra flip.
-    const ux = a.uv[0] * size;
-    const uy = a.uv[1] * size;
-    ctx.beginPath();
-    ctx.arc(ux, uy, BRUSH, 0, Math.PI * 2);
-    ctx.fill();
+    // Signed area in source image: positive for front-facing
+    // triangles, negative when the user rotates away and MP's
+    // extrapolated landmarks flip the winding.
+    const signedArea = (sx2 - sx1) * (sy3 - sy1) - (sx3 - sx1) * (sy2 - sy1);
+    if (signedArea <= 0) continue;
+
+    const dx1 = a.uv[0] * size, dy1 = a.uv[1] * size;
+    const dx2 = b.uv[0] * size, dy2 = b.uv[1] * size;
+    const dx3 = c.uv[0] * size, dy3 = c.uv[1] * size;
+
+    drawTriangleWarp(ctx, sampleCanvas,
+      sx1, sy1, sx2, sy2, sx3, sy3,
+      dx1, dy1, dx2, dy2, dx3, dy3);
   }
-  ctx.globalAlpha = 1.0;
-  faceTex.texture.needsUpdate = true;
+  texture.needsUpdate = true;
+}
+
+// Affine warp of an arbitrary triangle in `src` to an arbitrary
+// triangle in `ctx`. Uses setTransform with the unique affine matrix
+// mapping (s1,s2,s3) to (d1,d2,d3), clipped to the destination
+// triangle so only pixels inside are drawn.
+function drawTriangleWarp(
+  ctx, src,
+  sx1, sy1, sx2, sy2, sx3, sy3,
+  dx1, dy1, dx2, dy2, dx3, dy3,
+) {
+  // Solve for affine M such that M * [sx_i; sy_i; 1] = [dx_i; dy_i].
+  // Two 3x3 systems, one per output axis, sharing the same design
+  // matrix. Inline to avoid allocations.
+  const det = sx1 * (sy2 - sy3) - sy1 * (sx2 - sx3) + (sx2 * sy3 - sx3 * sy2);
+  if (Math.abs(det) < 1e-9) return;
+  const inv = 1 / det;
+  const a = (dx1 * (sy2 - sy3) + dx2 * (sy3 - sy1) + dx3 * (sy1 - sy2)) * inv;
+  const b = (dx1 * (sx3 - sx2) + dx2 * (sx1 - sx3) + dx3 * (sx2 - sx1)) * inv;
+  const e = (dx1 * (sx2 * sy3 - sx3 * sy2)
+           + dx2 * (sx3 * sy1 - sx1 * sy3)
+           + dx3 * (sx1 * sy2 - sx2 * sy1)) * inv;
+  const c = (dy1 * (sy2 - sy3) + dy2 * (sy3 - sy1) + dy3 * (sy1 - sy2)) * inv;
+  const d = (dy1 * (sx3 - sx2) + dy2 * (sx1 - sx3) + dy3 * (sx2 - sx1)) * inv;
+  const f = (dy1 * (sx2 * sy3 - sx3 * sy2)
+           + dy2 * (sx3 * sy1 - sx1 * sy3)
+           + dy3 * (sx1 * sy2 - sx2 * sy1)) * inv;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(dx1, dy1);
+  ctx.lineTo(dx2, dy2);
+  ctx.lineTo(dx3, dy3);
+  ctx.closePath();
+  ctx.clip();
+  ctx.setTransform(a, c, b, d, e, f);
+  ctx.drawImage(src, 0, 0);
+  ctx.restore();
 }
 
 // Find the head bone on a MH skinned mesh. MH skeletons expose it as
