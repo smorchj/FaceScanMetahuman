@@ -46,6 +46,14 @@ export async function start(opts) {
   const skin = findSkinMesh(three.gltf.scene, preferredMesh);
   if (!skin) throw new Error('could not find a face/head mesh in GLB');
 
+  // Head bone for visible pose matching: during capture we rotate
+  // this bone each tick so Ada follows the user's head rotation in
+  // the main view, which also makes our MP detect pass (rendered
+  // head-on) see her at the same pose as the user.
+  const headBone = findHeadBone(skin);
+  const headBoneRestQuat = headBone ? headBone.quaternion.clone() : null;
+  console.log('[demo] head bone:', headBone ? headBone.name : '(not found)');
+
   // Snapshot rest positions for every head-adjacent mesh so the warp
   // can carry eyeballs, teeth, lashes, brows, and hair along with the
   // skin. Each entry: { mesh, rest (Float32Array), attr }. Reset
@@ -186,6 +194,11 @@ export async function start(opts) {
       clearInterval(captureLoopId);
       captureLoopId = null;
     }
+    // Restore Ada's head bone to rest so she is not stuck at whatever
+    // pose the last tick set.
+    if (headBone && headBoneRestQuat) {
+      headBone.quaternion.copy(headBoneRestQuat);
+    }
     captureBtn.textContent = 'Start capture';
     setStatus('capture stopped.');
   }
@@ -197,14 +210,18 @@ export async function start(opts) {
       if (userRecent.length > USER_SMOOTH_N) userRecent.shift();
       const userAvg = averageLandmarks(userRecent);
 
-      // Pose-match Ada: render her from the detect camera rotated to
-      // match the user's current head rotation, then run MP on that
-      // render. Both lattices are now at the same pose; rigid-align
-      // residual becomes identity at that pose, and we un-rotate it
-      // back to canonical before writing into MH space.
+      // Apply user's head rotation to Ada's head bone so she visibly
+      // mirrors the user's pose. Both the main view and the offscreen
+      // MP detect view see a pose-matched Ada.
       const userQuat = rotationFromMatrix16(latestMatrix);
-      const adaLmPose = await renderAdaPoseMatched(
-        three, userQuat, HARDCODED_FOV, imgLandmarker,
+      if (headBone && headBoneRestQuat) {
+        headBone.quaternion.copy(headBoneRestQuat).multiply(userQuat);
+      }
+
+      // Render Ada head-on from detect camera (her head bone is now
+      // rotated so MP sees her at the user's pose).
+      const adaLmPose = await renderAdaHeadOn(
+        three, HARDCODED_FOV, imgLandmarker,
       );
       if (!adaLmPose) return;
 
@@ -284,6 +301,58 @@ function rotationFromMatrix16(m) {
   const scl = new THREE.Vector3();
   mat.decompose(pos, q, scl);
   return q;
+}
+
+// Find the head bone on a MH skinned mesh. MH skeletons expose it as
+// "head" but lowercase vs capitalized varies by export.
+function findHeadBone(skin) {
+  if (!skin.skeleton || !skin.skeleton.bones) return null;
+  const bones = skin.skeleton.bones;
+  for (const b of bones) if ((b.name || '').toLowerCase() === 'head') return b;
+  for (const b of bones) if ((b.name || '').toLowerCase().includes('head')) return b;
+  return null;
+}
+
+// Render Ada head-on from a detect camera at the current scene
+// framing. Ada's bone state (including any head-bone rotation the
+// caller has set) is applied during rendering, so MP sees her in
+// whatever pose the skeleton currently encodes.
+async function renderAdaHeadOn(three, fovDeg, landmarker) {
+  const DETECT = 512;
+  const cam = new THREE.PerspectiveCamera(fovDeg, 1, 0.01, 20);
+  const target = three.controls ? three.controls.target.clone()
+                                : new THREE.Vector3(0, 1.5, 0);
+  const restDist = three.camera.position.distanceTo(target);
+  cam.position.set(target.x, target.y, target.z + restDist);
+  cam.up.set(0, 1, 0);
+  cam.lookAt(target);
+  cam.updateMatrixWorld();
+  cam.updateProjectionMatrix();
+
+  const rt = new THREE.WebGLRenderTarget(DETECT, DETECT, {
+    colorSpace: THREE.SRGBColorSpace,
+  });
+  three.renderer.setRenderTarget(rt);
+  three.renderer.render(three.scene, cam);
+  three.renderer.setRenderTarget(null);
+  const pixels = new Uint8Array(DETECT * DETECT * 4);
+  three.renderer.readRenderTargetPixels(rt, 0, 0, DETECT, DETECT, pixels);
+  rt.dispose();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = DETECT;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(DETECT, DETECT);
+  const rowBytes = DETECT * 4;
+  for (let y = 0; y < DETECT; y++) {
+    const src = (DETECT - 1 - y) * rowBytes;
+    img.data.set(pixels.subarray(src, src + rowBytes), y * rowBytes);
+  }
+  ctx.putImageData(img, 0, 0);
+
+  const result = landmarker.detect(canvas);
+  if (!result.faceLandmarks || !result.faceLandmarks[0]) return null;
+  return result.faceLandmarks[0];
 }
 
 // Render Ada with the detect camera rotated to match the user's head
