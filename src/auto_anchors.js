@@ -73,20 +73,28 @@ export async function start(opts) {
     detectCamera.updateProjectionMatrix();
     offRenderer.render(three.scene, detectCamera);
 
-    setStatus('running MediaPipe on Ada...');
+    // Show the thumbnail first so the operator can see what MP was
+    // actually given, regardless of whether detection succeeds.
+    drawThumb(thumb, offCanvas, null);
+    // Sanity: are the pixels non-black?
+    const tctx = thumb.getContext('2d');
+    const sample = tctx.getImageData(thumb.width / 2, thumb.height / 2, 1, 1).data;
+    const midPixel = '(' + sample[0] + ',' + sample[1] + ',' + sample[2] + ')';
+
+    setStatus('running MediaPipe on Ada... (centre pixel rgb ' + midPixel + ')');
     const result = landmarker.detect(offCanvas);
     if (!result.faceLandmarks || !result.faceLandmarks[0]) {
-      setStatus('MediaPipe did not detect a face. Tweak the camera so '
-                + 'Ada looks head-on and try again.');
+      setStatus('MediaPipe did not detect a face.\n'
+                + 'Centre pixel rgb: ' + midPixel + '\n'
+                + 'Thumbnail shows exactly what MP was given. '
+                + 'If it looks blank / monochrome, the render is the problem. '
+                + 'If it looks like Ada, MP is rejecting her.');
       runBtn.disabled = false;
       return;
     }
     const landmarks = result.faceLandmarks[0];
 
-    setStatus('raycasting ' + landmarks.length + ' landmarks into the mesh...');
-
-    // Draw a debug thumbnail with detected landmarks on top so the
-    // operator can visually confirm MP is landmarking Ada correctly.
+    // Redraw with landmark overlay on top.
     drawThumb(thumb, offCanvas, landmarks);
 
     const raycaster = new THREE.Raycaster();
