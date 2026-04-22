@@ -6,7 +6,6 @@
 // live update. The goal is to see "that looks like me-ish" and move on.
 
 import * as THREE from 'three';
-import Delaunator from 'https://cdn.skypack.dev/delaunator@5.0.1';
 import { mount } from './viewer.js';
 
 import { MP_INDICES } from './mp_indices.js';
@@ -55,13 +54,36 @@ export async function start(opts) {
   const headBoneRestQuat = headBone ? headBone.quaternion.clone() : null;
   console.log('[demo] head bone:', headBone ? headBone.name : '(not found)');
 
-  // Dynamic diffuse texture seeded from Ada's existing face map.
-  const faceTex = initFaceTexture(skin);
-  console.log('[demo] dynamic face texture: ', faceTex ? faceTex.size : '(skipped)');
-
-  // Webcam snapshot canvas reused every tick.
-  const sampleCanvas = document.createElement('canvas');
-  const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+  // 3D projective texturing via per-vertex UVs:
+  //   - Back up the mesh's original UVs so we can restore them.
+  //   - Use the webcam as a VideoTexture and assign it to the face
+  //     skin material's .map.
+  //   - Each capture tick, recompute per-vertex UVs from an RBF that
+  //     maps anchor 3D rest positions to their current MP image
+  //     positions. Rasterizer then projects the webcam onto the
+  //     face via the mesh's own triangulation. Verts far from any
+  //     anchor keep their original UVs so Ada's texture stays for
+  //     scalp, neck, ears.
+  const uvAttr0 = skin.geometry.attributes.uv;
+  const originalUvArr = uvAttr0 ? new Float32Array(uvAttr0.array) : null;
+  const videoTex = new THREE.VideoTexture(video);
+  videoTex.colorSpace = THREE.SRGBColorSpace;
+  videoTex.flipY = true;
+  videoTex.wrapS = videoTex.wrapT = THREE.ClampToEdgeWrapping;
+  const skinMat = Array.isArray(skin.material) ? skin.material[0] : skin.material;
+  const originalSkinMap = skinMat ? skinMat.map : null;
+  function setVideoMap() {
+    if (!skinMat) return;
+    skinMat.map = videoTex;
+    skinMat.needsUpdate = true;
+  }
+  function restoreOriginalMap() {
+    if (skinMat) { skinMat.map = originalSkinMap; skinMat.needsUpdate = true; }
+    if (originalUvArr && uvAttr0) {
+      uvAttr0.array.set(originalUvArr);
+      uvAttr0.needsUpdate = true;
+    }
+  }
 
   // Snapshot rest positions for every head-adjacent mesh so the warp
   // can carry eyeballs, teeth, lashes, brows, and hair along with the
@@ -194,44 +216,11 @@ export async function start(opts) {
       cachedMpToMh     = built.mpToMh;
       cachedAdaLmRaw   = built.adaLandmarksRaw;
       cachedFovDeg     = HARDCODED_FOV;
-      // Cache each anchor's UV so the texture painter can find it fast.
-      const uvAttr = skin.geometry.attributes.uv;
-      for (const a of cachedAnchors) {
-        a.uv = uvAttr ? [uvAttr.getX(a.mhIdx), uvAttr.getY(a.mhIdx)] : null;
-      }
-      // Triangulate the anchors in 3D (project onto XY; face is
-      // front-facing so this is topologically correct). UV-space
-      // triangulation was connecting anchors across texture seams,
-      // producing spurious triangles that wrapped onto non-face
-      // regions of Ada's unwrap. 3D triangulation respects real
-      // face topology.
-      //
-      // Then drop any triangle whose longest 3D edge exceeds a
-      // threshold (faces don't have adjacencies spanning the whole
-      // head), which eliminates the remaining convex-hull edges
-      // that cross from ear to nose etc.
-      const flat = [];
-      for (const a of cachedAnchors) {
-        flat.push(a.mhRest[0], a.mhRest[1]);
-      }
-      const d = new Delaunator(flat);
-      const MAX_EDGE = 0.05; // metres; MH face-vert spacing is <~3cm
-      cachedTriangles = [];
-      for (let i = 0; i < d.triangles.length; i += 3) {
-        const ia = d.triangles[i], ib = d.triangles[i + 1], ic = d.triangles[i + 2];
-        const pa = cachedAnchors[ia].mhRest;
-        const pb = cachedAnchors[ib].mhRest;
-        const pc = cachedAnchors[ic].mhRest;
-        const e1 = dist3(pa, pb), e2 = dist3(pb, pc), e3 = dist3(pc, pa);
-        if (e1 > MAX_EDGE || e2 > MAX_EDGE || e3 > MAX_EDGE) continue;
-        cachedTriangles.push([ia, ib, ic]);
-      }
-      setStatus('anchors: ' + cachedAnchors.length
-                + ', triangles: ' + cachedTriangles.length
-                + '. capturing live...');
+      setStatus('anchors: ' + cachedAnchors.length + '. capturing live...');
     }
     userRecent = [];
     userQuatRef = null;
+    setVideoMap();
     captureLoopId = setInterval(() => captureTick(), SAMPLE_INTERVAL_MS);
   }
 
@@ -240,11 +229,10 @@ export async function start(opts) {
       clearInterval(captureLoopId);
       captureLoopId = null;
     }
-    // Restore Ada's head bone to rest so she is not stuck at whatever
-    // pose the last tick set.
     if (headBone && headBoneRestQuat) {
       headBone.quaternion.copy(headBoneRestQuat);
     }
+    restoreOriginalMap();
     captureBtn.textContent = 'Start capture';
     setStatus('capture stopped.');
   }
@@ -287,13 +275,16 @@ export async function start(opts) {
       );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
 
-      // Project the webcam onto the face texture via triangle warp.
-      if (faceTex && cachedTriangles) {
-        projectWebcamTriangles(
-          faceTex, video, sampleCanvas, sampleCtx,
-          latest, cachedAnchors, cachedTriangles,
-        );
-      }
+      // Project webcam onto the mesh by rewriting per-vertex UVs.
+      // The 478 MP landmarks give us an exact 3D→2D correspondence
+      // for each anchor; RBF smooths between anchors so every face
+      // vertex gets a valid sample coord. Verts too far from any
+      // anchor (scalp, neck, ears) keep their original UV so Ada's
+      // own texture stays there.
+      updateFaceUVsFromLattice(
+        skin, uvAttr0, originalUvArr,
+        cachedAnchors, latest,
+      );
 
       setStatus('capturing (pose-matched lattice)\n'
         + 'smoothed frames: ' + userRecent.length + '\n'
@@ -408,6 +399,61 @@ function anchorFacesCamera(anchor, userQuat, cachedAdaLmRaw) {
   // Rotate by the user's head rotation (delta from head-on).
   const v = new THREE.Vector3(dx, dy, dz).applyQuaternion(userQuat);
   return v.z > 0.01;
+}
+
+// Rewrite each face vertex's UV so it samples the webcam pixel that
+// geometrically corresponds to its spot on Ada's face. An RBF
+// interpolates between the 478 anchor correspondences so every vertex
+// inside the face region gets a valid sample coord. Verts beyond
+// FACE_REACH (metres) from any anchor keep their original UV so
+// Ada's own map shows through on neck, ears, back of head.
+function updateFaceUVsFromLattice(skin, uvAttr, origUv, anchors, userLm) {
+  if (!uvAttr || !origUv) return;
+  const FACE_REACH = 0.04;
+  const reachSq = FACE_REACH * FACE_REACH;
+
+  // Build RBF: source = anchor 3D rest positions, target = anchor
+  // MP 2D image positions (z packed as 0). Output x,y are the
+  // webcam UVs; z we ignore.
+  const sources = anchors.map((a) => a.mhRest);
+  const targets = anchors.map((a) => {
+    const l = userLm[a.mpIdx];
+    return [l.x, l.y, 0];
+  });
+  const warp = solveWarp(sources, targets);
+
+  const posAttr = skin.geometry.attributes.position;
+  const arr = uvAttr.array;
+  const n = posAttr.count;
+  const pt = [0, 0, 0];
+  const out = [0, 0, 0];
+
+  for (let i = 0; i < n; i++) {
+    pt[0] = posAttr.getX(i);
+    pt[1] = posAttr.getY(i);
+    pt[2] = posAttr.getZ(i);
+
+    // Nearest anchor distance
+    let minSq = Infinity;
+    for (let k = 0; k < anchors.length; k++) {
+      const a = anchors[k].mhRest;
+      const dx = pt[0] - a[0], dy = pt[1] - a[1], dz = pt[2] - a[2];
+      const d = dx * dx + dy * dy + dz * dz;
+      if (d < minSq) minSq = d;
+    }
+    if (minSq > reachSq) {
+      arr[i * 2 + 0] = origUv[i * 2 + 0];
+      arr[i * 2 + 1] = origUv[i * 2 + 1];
+      continue;
+    }
+
+    applyWarp(warp, pt, out);
+    // MP normalized coords are [0,1]. Clamp so any overshoot does
+    // not wrap to weird parts of the webcam texture.
+    arr[i * 2 + 0] = Math.max(0, Math.min(1, out[0]));
+    arr[i * 2 + 1] = Math.max(0, Math.min(1, out[1]));
+  }
+  uvAttr.needsUpdate = true;
 }
 
 // Project webcam pixels into the dynamic face texture, one affine
