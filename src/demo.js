@@ -190,14 +190,37 @@ export async function start(opts) {
 // All head-adjacent meshes that should ride along with the warped face.
 // Keyword match covers MH face sub-meshes, hair cards, lash/brow cards,
 // teeth, and tongue. Skips body, clothing, and anything further away.
-const HEAD_MESH_HINTS = ['face', 'head', 'hair', 'lash', 'brow', 'teeth', 'tongue', 'saliva', 'occlusion'];
+//
+// `category`:
+//   'skin' -- distance-weighted falloff from face anchors (face skin,
+//             teeth, tongue, occlusion — things that sit in the head and
+//             should follow the face shape but respect the falloff).
+//   'attached' -- full warp (w = 1) regardless of distance. Hair, lashes,
+//                 and brows sit OFFSET from the scalp and would otherwise
+//                 float because their verts fall outside the falloff
+//                 radius.
+const HEAD_MESH_HINTS = {
+  face:    'skin',
+  head:    'skin',
+  teeth:   'skin',
+  tongue:  'skin',
+  saliva:  'skin',
+  occlusion: 'skin',
+  hair:    'attached',
+  lash:    'attached',
+  brow:    'attached',
+};
 
 function collectHeadMeshes(root) {
   const out = [];
   root.traverse((obj) => {
     if (!obj.isMesh) return;
     const n = (obj.name || '').toLowerCase();
-    if (HEAD_MESH_HINTS.some((h) => n.includes(h))) out.push({ mesh: obj });
+    let category = null;
+    for (const [hint, cat] of Object.entries(HEAD_MESH_HINTS)) {
+      if (n.includes(hint)) { category = cat; break; }
+    }
+    if (category) out.push({ mesh: obj, category });
   });
   return out;
 }
@@ -235,22 +258,63 @@ function runWarp(mpLandmarks, anchors, warpTargets) {
   }
   residual /= anchors.length;
 
-  // Apply to every vertex of every head-adjacent mesh.
+  // Per-vertex distance-weighted blend: full warp on the face, tapers
+  // to zero past `FALLOFF_OUTER` metres so the back of the head,
+  // neck, and shoulders keep the rest geometry. Biharmonic RBF
+  // extrapolation otherwise drifts unboundedly with distance.
+  const FALLOFF_INNER = 0.02;      // inside this, weight = 1.0
+  const FALLOFF_OUTER = 0.09;      // past this, weight = 0.0
+  const innerSq = FALLOFF_INNER * FALLOFF_INNER;
+  const outerSq = FALLOFF_OUTER * FALLOFF_OUTER;
+  const anchorRest = mhAnchors; // reuse array-of-3 already built above
+
   let delta = 0, totalVerts = 0;
   const point = [0, 0, 0];
   const out = [0, 0, 0];
   for (const t of warpTargets) {
     const arr = t.attr.array;
     const n = arr.length / 3;
+    // Hair / lashes / brows get full warp so they stay glued to the
+    // scalp. Skin-category meshes use distance-weighted falloff.
+    const forceFull = t.category === 'attached';
     for (let i = 0; i < n; i++) {
-      point[0] = t.rest[i * 3 + 0];
-      point[1] = t.rest[i * 3 + 1];
-      point[2] = t.rest[i * 3 + 2];
-      applyWarp(warp, point, out);
-      arr[i * 3 + 0] = out[0];
-      arr[i * 3 + 1] = out[1];
-      arr[i * 3 + 2] = out[2];
-      const ddx = out[0] - point[0], ddy = out[1] - point[1], ddz = out[2] - point[2];
+      const rx = t.rest[i * 3 + 0];
+      const ry = t.rest[i * 3 + 1];
+      const rz = t.rest[i * 3 + 2];
+
+      let w;
+      if (forceFull) {
+        w = 1;
+      } else {
+        // Nearest-anchor squared distance.
+        let minSq = Infinity;
+        for (let k = 0; k < anchorRest.length; k++) {
+          const ax = anchorRest[k][0], ay = anchorRest[k][1], az = anchorRest[k][2];
+          const dx = rx - ax, dy = ry - ay, dz = rz - az;
+          const d = dx*dx + dy*dy + dz*dz;
+          if (d < minSq) minSq = d;
+        }
+        if (minSq <= innerSq) w = 1;
+        else if (minSq >= outerSq) w = 0;
+        else {
+          const dist = Math.sqrt(minSq);
+          const u = (dist - FALLOFF_INNER) / (FALLOFF_OUTER - FALLOFF_INNER);
+          w = 1 - (3 * u * u - 2 * u * u * u); // inverted smoothstep
+        }
+      }
+
+      if (w > 0) {
+        point[0] = rx; point[1] = ry; point[2] = rz;
+        applyWarp(warp, point, out);
+        arr[i * 3 + 0] = rx + w * (out[0] - rx);
+        arr[i * 3 + 1] = ry + w * (out[1] - ry);
+        arr[i * 3 + 2] = rz + w * (out[2] - rz);
+      } else {
+        arr[i * 3 + 0] = rx;
+        arr[i * 3 + 1] = ry;
+        arr[i * 3 + 2] = rz;
+      }
+      const ddx = arr[i*3+0] - rx, ddy = arr[i*3+1] - ry, ddz = arr[i*3+2] - rz;
       delta += Math.sqrt(ddx*ddx + ddy*ddy + ddz*ddz);
     }
     totalVerts += n;
@@ -388,9 +452,14 @@ async function buildAnchorsAtFov(three, skin, landmarker, fovDeg) {
       const d = wp.distanceToSquared(hit.point);
       if (d < bestDist) { bestDist = d; bestIdx = idx; }
     }
+    rest.fromBufferAttribute(posAttr, bestIdx);
+    // Drop anchors that landed on the ear or back of the head. MH face
+    // landmarks sit at z ~ 0.05 .. 0.12 in the mesh's local frame; the
+    // ears and neck trail off to z ~ 0. Keeps the warp from pulling
+    // MP's wide face-silhouette landmarks into the MH ears.
+    if (rest.z < 0.02) continue;
     if (seenVerts.has(bestIdx)) continue;
     seenVerts.add(bestIdx);
-    rest.fromBufferAttribute(posAttr, bestIdx);
     out.push({
       name: 'mp_' + i,
       mhIdx: bestIdx,
