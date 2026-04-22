@@ -21,23 +21,30 @@ export async function start(opts) {
 
   const setStatus = (s) => { statusEl.textContent = s; };
 
-  setStatus('fetching GLB, materials, and anchors...');
-  const [three, anchorsData] = await Promise.all([
-    mount(stage, {
-      glbUrl,
-      mappingUrl: opts.mappingUrl,
-      autoRotate: false,
-      interactive: true,
-      characterId: opts.characterId,
-    }),
-    fetch(anchorsUrl).then((r) => {
-      if (!r.ok) throw new Error('anchors: ' + r.status + ' ' + anchorsUrl);
-      return r.json();
-    }),
-  ]);
+  setStatus('fetching GLB and materials...');
+  const three = await mount(stage, {
+    glbUrl,
+    mappingUrl: opts.mappingUrl,
+    autoRotate: false,
+    interactive: true,
+    characterId: opts.characterId,
+  });
 
-  const skin = findSkinMesh(three.gltf.scene, anchorsData.anchors[0].meshName);
-  if (!skin) throw new Error('could not find skin mesh ' + anchorsData.anchors[0].meshName);
+  // Optional starter anchors: kept for backward compat. If it loads
+  // we seed the overlay with it. First Capture rebuilds from scratch
+  // at the estimated FOV, which typically supersedes this file.
+  let anchorsData = null;
+  if (anchorsUrl) {
+    try {
+      const r = await fetch(anchorsUrl);
+      if (r.ok) anchorsData = await r.json();
+    } catch (_) { /* fine, we'll build on first capture */ }
+  }
+
+  const preferredMesh = anchorsData && anchorsData.anchors[0]
+                        && anchorsData.anchors[0].meshName;
+  const skin = findSkinMesh(three.gltf.scene, preferredMesh);
+  if (!skin) throw new Error('could not find a face/head mesh in GLB');
 
   // Snapshot rest positions for every head-adjacent mesh so the warp
   // can carry eyeballs, teeth, lashes, brows, and hair along with the
@@ -54,28 +61,25 @@ export async function start(opts) {
   }
   console.log('[demo] warp targets:', warpTargets.map((t) => t.mesh.name));
 
-  // Pair up MH rest anchors with MediaPipe indices. Auto-generated
-  // anchor files carry `mpIndex` directly; the legacy hand-picked file
-  // relies on the name -> index lookup in mp_indices.js.
-  // Dedup on MH vertex index: auto-map sometimes lands two MP
-  // landmarks on the same MH vert (e.g. adjacent inner-lip indices),
-  // which makes the RBF kernel singular. First pick wins.
-  const seen = new Set();
+  // Seed anchors from the optional file. Empty array otherwise; the
+  // first Capture rebuilds from the current webcam FOV anyway.
   const anchors = [];
-  for (const a of anchorsData.anchors) {
-    const mpIdx = (a.mpIndex !== undefined) ? a.mpIndex : MP_INDICES[a.name];
-    if (mpIdx === undefined) continue;
-    if (seen.has(a.vertexIndex)) continue;
-    seen.add(a.vertexIndex);
-    anchors.push({
-      name: a.name,
-      mhIdx: a.vertexIndex,
-      mhRest: a.restPosition.slice(),
-      mpIdx,
-    });
+  if (anchorsData) {
+    const seen = new Set();
+    for (const a of anchorsData.anchors) {
+      const mpIdx = (a.mpIndex !== undefined) ? a.mpIndex : MP_INDICES[a.name];
+      if (mpIdx === undefined) continue;
+      if (seen.has(a.vertexIndex)) continue;
+      seen.add(a.vertexIndex);
+      anchors.push({
+        name: a.name,
+        mhIdx: a.vertexIndex,
+        mhRest: a.restPosition.slice(),
+        mpIdx,
+      });
+    }
+    console.log('[demo] seed anchors from file:', anchors.length);
   }
-  console.log('[demo] anchors after dedup:', anchors.length,
-              'of', anchorsData.anchors.length);
 
   frameHead(three.gltf.scene, three.camera, three.controls);
 
@@ -83,9 +87,19 @@ export async function start(opts) {
   const vision = await import(MP_BUNDLE);
   const { FaceLandmarker, FilesetResolver } = vision;
   const resolver = await FilesetResolver.forVisionTasks(MP_WASM);
+  // Two landmarker instances: one for live webcam (VIDEO mode), one
+  // for on-demand Ada renders (IMAGE mode). MP does not let a single
+  // instance switch between modes.
   const landmarker = await FaceLandmarker.createFromOptions(resolver, {
     baseOptions: { modelAssetPath: MP_MODEL, delegate: 'GPU' },
     runningMode: 'VIDEO',
+    numFaces: 1,
+    outputFaceBlendshapes: false,
+    outputFacialTransformationMatrixes: true,
+  });
+  const imgLandmarker = await FaceLandmarker.createFromOptions(resolver, {
+    baseOptions: { modelAssetPath: MP_MODEL, delegate: 'GPU' },
+    runningMode: 'IMAGE',
     numFaces: 1,
     outputFaceBlendshapes: false,
     outputFacialTransformationMatrixes: false,
@@ -104,15 +118,25 @@ export async function start(opts) {
   overlay.width = video.videoWidth;
   overlay.height = video.videoHeight;
 
+  // Declare anchor cache before the tick loop so the overlay can
+  // show whichever anchor set is currently driving the warp.
+  let cachedAnchors = null;
+  let cachedFovDeg = null;
+
   let latest = null;
+  let latestMatrix = null;
   (function tick() {
     if (video.readyState >= 2) {
       const res = landmarker.detectForVideo(video, performance.now());
       if (res.faceLandmarks && res.faceLandmarks[0]) {
         latest = res.faceLandmarks[0];
-        drawOverlay(overlayCtx, overlay, latest, anchors);
+        latestMatrix = res.facialTransformationMatrixes
+                    && res.facialTransformationMatrixes[0]
+                    && res.facialTransformationMatrixes[0].data;
+        drawOverlay(overlayCtx, overlay, latest, cachedAnchors || anchors);
       } else {
         latest = null;
+        latestMatrix = null;
         overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
       }
     }
@@ -122,12 +146,26 @@ export async function start(opts) {
   captureBtn.disabled = false;
   setStatus('ready. look at the camera and click capture.');
 
-  captureBtn.addEventListener('click', () => {
+  // Per-FOV cache of auto-generated anchors is declared above the
+  // tick loop so the overlay can use whichever set is active.
+  captureBtn.addEventListener('click', async () => {
     if (!latest) { setStatus('no face detected right now'); return; }
+    if (!latestMatrix) { setStatus('no facial matrix yet; wait a beat and retry'); return; }
+    captureBtn.disabled = true;
     try {
-      const warpStats = runWarp(latest, anchors, warpTargets);
+      const fovDeg = estimateWebcamFovDeg(latest, latestMatrix);
+      setStatus('estimated webcam FOV: ' + fovDeg.toFixed(1) + '°');
+      if (!cachedAnchors || Math.abs(fovDeg - cachedFovDeg) > 3) {
+        setStatus('FOV changed to ' + fovDeg.toFixed(1) + '°; rebuilding anchors on Ada...');
+        cachedAnchors = await buildAnchorsAtFov(three, skin, imgLandmarker, fovDeg);
+        cachedFovDeg = fovDeg;
+        setStatus('anchors built at FOV ' + fovDeg.toFixed(1) + '° ('
+                  + cachedAnchors.length + ' mapped). Warping...');
+      }
+      const warpStats = runWarp(latest, cachedAnchors, warpTargets);
       setStatus(
         'warp applied.\n' +
+        'FOV: ' + cachedFovDeg.toFixed(1) + '°\n' +
         'anchors: ' + warpStats.n + '\n' +
         'mean anchor residual: ' + warpStats.meanResidual.toFixed(5) + ' m\n' +
         'mean vertex delta:    ' + warpStats.meanDelta.toFixed(5) + ' m'
@@ -136,6 +174,7 @@ export async function start(opts) {
       console.error(err);
       setStatus('warp failed: ' + (err.message || err));
     }
+    captureBtn.disabled = false;
   });
 
   resetBtn.addEventListener('click', () => {
@@ -252,6 +291,114 @@ function frameHead(root, camera, controls) {
   camera.position.set(target.x, target.y, target.z + Math.max(size.y, size.x) * 0.6);
   controls.target.copy(target);
   controls.update();
+}
+
+// Derive the user's webcam FOV from a single MediaPipe detection.
+//
+// MP returns each landmark in normalized image coords and a rigid
+// 4x4 transformation matrix (column-major) placing MP's canonical
+// face in camera space. The face's projected width in the image is
+// related to its real metric width, its distance from the camera
+// (tz), and the camera's focal length. Solve for FOV.
+//
+// MP's canonical face model is roughly 15 units wide across the
+// outer-ear landmarks (indices 234 and 454), in whatever unit the
+// matrix translation uses. We measure those two landmarks' image
+// distance and back out FOV.
+function estimateWebcamFovDeg(landmarks, matrix) {
+  const tz = Math.abs(matrix[14]);
+  // Distance between MP's "ear trace" landmarks; these live on the
+  // canonical face's widest cross-section and stay at consistent
+  // relative position regardless of expression.
+  const L = 234, R = 454;
+  const dx = landmarks[L].x - landmarks[R].x;
+  const dy = landmarks[L].y - landmarks[R].y;
+  const faceWidthImage = Math.sqrt(dx * dx + dy * dy);
+  // Empirical canonical width in matrix units. If estimates look
+  // systematically high or low, tune this constant.
+  const CANONICAL_WIDTH = 15;
+  const fovRad = 2 * Math.atan(CANONICAL_WIDTH / (2 * tz * faceWidthImage));
+  // Clamp to plausible range so a garbage detection does not wreck
+  // the anchor rebuild.
+  const degs = THREE.MathUtils.radToDeg(fovRad);
+  return Math.min(110, Math.max(35, degs));
+}
+
+// Render Ada at a given FOV, run MP on that render, raycast each of
+// the 478 landmarks back into the mesh. Returns the anchor list in
+// the same shape the warp expects.
+async function buildAnchorsAtFov(three, skin, landmarker, fovDeg) {
+  const DETECT_SIZE = 1024;
+  const cam = three.camera.clone();
+  cam.fov = fovDeg;
+  cam.aspect = 1;
+  cam.updateProjectionMatrix();
+
+  const rt = new THREE.WebGLRenderTarget(DETECT_SIZE, DETECT_SIZE, {
+    colorSpace: THREE.SRGBColorSpace,
+  });
+  three.renderer.setRenderTarget(rt);
+  three.renderer.render(three.scene, cam);
+  three.renderer.setRenderTarget(null);
+  const pixels = new Uint8Array(DETECT_SIZE * DETECT_SIZE * 4);
+  three.renderer.readRenderTargetPixels(rt, 0, 0, DETECT_SIZE, DETECT_SIZE, pixels);
+  rt.dispose();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = DETECT_SIZE;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(DETECT_SIZE, DETECT_SIZE);
+  const rowBytes = DETECT_SIZE * 4;
+  for (let y = 0; y < DETECT_SIZE; y++) {
+    const src = (DETECT_SIZE - 1 - y) * rowBytes;
+    img.data.set(pixels.subarray(src, src + rowBytes), y * rowBytes);
+  }
+  ctx.putImageData(img, 0, 0);
+
+  const result = landmarker.detect(canvas);
+  if (!result.faceLandmarks || !result.faceLandmarks[0]) {
+    throw new Error('MP did not detect Ada at FOV ' + fovDeg.toFixed(1));
+  }
+  const landmarks = result.faceLandmarks[0];
+
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  const out = [];
+  const seenVerts = new Set();
+  const wp = new THREE.Vector3();
+  const rest = new THREE.Vector3();
+  const posAttr = skin.geometry.attributes.position;
+
+  for (let i = 0; i < landmarks.length; i++) {
+    const l = landmarks[i];
+    ndc.set(l.x * 2 - 1, -(l.y * 2 - 1));
+    raycaster.setFromCamera(ndc, cam);
+    const hits = raycaster.intersectObject(skin, false);
+    if (!hits.length) continue;
+    const hit = hits[0];
+    const face = hit.face;
+    let bestIdx = face.a, bestDist = Infinity;
+    for (const idx of [face.a, face.b, face.c]) {
+      if (skin.isSkinnedMesh && skin.getVertexPosition) {
+        skin.getVertexPosition(idx, wp);
+      } else {
+        wp.fromBufferAttribute(posAttr, idx);
+      }
+      wp.applyMatrix4(skin.matrixWorld);
+      const d = wp.distanceToSquared(hit.point);
+      if (d < bestDist) { bestDist = d; bestIdx = idx; }
+    }
+    if (seenVerts.has(bestIdx)) continue;
+    seenVerts.add(bestIdx);
+    rest.fromBufferAttribute(posAttr, bestIdx);
+    out.push({
+      name: 'mp_' + i,
+      mhIdx: bestIdx,
+      mhRest: [rest.x, rest.y, rest.z],
+      mpIdx: i,
+    });
+  }
+  return out;
 }
 
 function drawOverlay(ctx, canvas, landmarks, anchors) {
