@@ -432,9 +432,11 @@ function projectWebcamTriangles(
     const signedArea = (sx2 - sx1) * (sy3 - sy1) - (sx3 - sx1) * (sy2 - sy1);
     if (signedArea <= 0) continue;
 
-    const dx1 = a.uv[0] * size, dy1 = a.uv[1] * size;
-    const dx2 = b.uv[0] * size, dy2 = b.uv[1] * size;
-    const dx3 = c.uv[0] * size, dy3 = c.uv[1] * size;
+    // MH mesh UVs put V=0 at the BOTTOM of the texture image; canvas
+    // coords put y=0 at the TOP. Flip V when converting to canvas.
+    const dx1 = a.uv[0] * size, dy1 = (1 - a.uv[1]) * size;
+    const dx2 = b.uv[0] * size, dy2 = (1 - b.uv[1]) * size;
+    const dx3 = c.uv[0] * size, dy3 = (1 - c.uv[1]) * size;
 
     drawTriangleWarp(ctx, sampleCanvas,
       sx1, sy1, sx2, sy2, sx3, sy3,
