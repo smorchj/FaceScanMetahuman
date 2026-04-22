@@ -221,6 +221,7 @@ function drawThumb(thumb, source, landmarks) {
   thumb.height = source.height;
   const ctx = thumb.getContext('2d');
   ctx.drawImage(source, 0, 0);
+  if (!landmarks) return;
   ctx.fillStyle = 'rgba(0,255,180,0.85)';
   for (const l of landmarks) {
     ctx.fillRect(l.x * thumb.width - 1.5, l.y * thumb.height - 1.5, 3, 3);
