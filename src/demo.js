@@ -55,13 +55,11 @@ export async function start(opts) {
   const headBoneRestQuat = headBone ? headBone.quaternion.clone() : null;
   console.log('[demo] head bone:', headBone ? headBone.name : '(not found)');
 
-  // Dynamic diffuse texture: seeded with Ada's existing skin color
-  // map, then painted live from the webcam during capture.
+  // Dynamic diffuse texture seeded from Ada's existing face map.
   const faceTex = initFaceTexture(skin);
   console.log('[demo] dynamic face texture: ', faceTex ? faceTex.size : '(skipped)');
 
-  // Hidden canvas that keeps a snapshot of the current webcam frame
-  // so getImageData sampling per anchor is cheap.
+  // Webcam snapshot canvas reused every tick.
   const sampleCanvas = document.createElement('canvas');
   const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
 
@@ -201,17 +199,32 @@ export async function start(opts) {
       for (const a of cachedAnchors) {
         a.uv = uvAttr ? [uvAttr.getX(a.mhIdx), uvAttr.getY(a.mhIdx)] : null;
       }
-      // Triangulate the anchor UVs. Delaunator wants a flat [x0,y0,x1,y1,...]
-      // of 2D points. We use UV space because that is where we ultimately
-      // paint; the same topology is reused for sampling webcam pixels.
+      // Triangulate the anchors in 3D (project onto XY; face is
+      // front-facing so this is topologically correct). UV-space
+      // triangulation was connecting anchors across texture seams,
+      // producing spurious triangles that wrapped onto non-face
+      // regions of Ada's unwrap. 3D triangulation respects real
+      // face topology.
+      //
+      // Then drop any triangle whose longest 3D edge exceeds a
+      // threshold (faces don't have adjacencies spanning the whole
+      // head), which eliminates the remaining convex-hull edges
+      // that cross from ear to nose etc.
       const flat = [];
       for (const a of cachedAnchors) {
-        flat.push(a.uv[0], a.uv[1]);
+        flat.push(a.mhRest[0], a.mhRest[1]);
       }
       const d = new Delaunator(flat);
+      const MAX_EDGE = 0.05; // metres; MH face-vert spacing is <~3cm
       cachedTriangles = [];
       for (let i = 0; i < d.triangles.length; i += 3) {
-        cachedTriangles.push([d.triangles[i], d.triangles[i + 1], d.triangles[i + 2]]);
+        const ia = d.triangles[i], ib = d.triangles[i + 1], ic = d.triangles[i + 2];
+        const pa = cachedAnchors[ia].mhRest;
+        const pb = cachedAnchors[ib].mhRest;
+        const pc = cachedAnchors[ic].mhRest;
+        const e1 = dist3(pa, pb), e2 = dist3(pb, pc), e3 = dist3(pc, pa);
+        if (e1 > MAX_EDGE || e2 > MAX_EDGE || e3 > MAX_EDGE) continue;
+        cachedTriangles.push([ia, ib, ic]);
       }
       setStatus('anchors: ' + cachedAnchors.length
                 + ', triangles: ' + cachedTriangles.length
@@ -481,6 +494,11 @@ function drawTriangleWarp(
   ctx.setTransform(a, c, b, d, e, f);
   ctx.drawImage(src, 0, 0);
   ctx.restore();
+}
+
+function dist3(a, b) {
+  const dx = a[0] - b[0], dy = a[1] - b[1], dz = a[2] - b[2];
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
 
 // Find the head bone on a MH skinned mesh. MH skeletons expose it as
