@@ -39,9 +39,20 @@ export async function start(opts) {
   const skin = findSkinMesh(three.gltf.scene, anchorsData.anchors[0].meshName);
   if (!skin) throw new Error('could not find skin mesh ' + anchorsData.anchors[0].meshName);
 
-  // Snapshot the rest pose so every warp starts from identity.
-  const posAttr = skin.geometry.attributes.position;
-  const restPositions = new Float32Array(posAttr.array);
+  // Snapshot rest positions for every head-adjacent mesh so the warp
+  // can carry eyeballs, teeth, lashes, brows, and hair along with the
+  // skin. Each entry: { mesh, rest (Float32Array), attr }. Reset
+  // button restores all of them.
+  const warpTargets = collectHeadMeshes(three.gltf.scene);
+  if (!warpTargets.some((t) => t.mesh === skin)) {
+    // Ensure the skin itself is in there even if the name heuristic missed it.
+    warpTargets.push({ mesh: skin });
+  }
+  for (const t of warpTargets) {
+    t.attr = t.mesh.geometry.attributes.position;
+    t.rest = new Float32Array(t.attr.array);
+  }
+  console.log('[demo] warp targets:', warpTargets.map((t) => t.mesh.name));
 
   // Pair up MH rest anchors with MediaPipe indices. Auto-generated
   // anchor files carry `mpIndex` directly; the legacy hand-picked file
@@ -114,7 +125,7 @@ export async function start(opts) {
   captureBtn.addEventListener('click', () => {
     if (!latest) { setStatus('no face detected right now'); return; }
     try {
-      const warpStats = runWarp(latest, anchors, skin, restPositions);
+      const warpStats = runWarp(latest, anchors, warpTargets);
       setStatus(
         'warp applied.\n' +
         'anchors: ' + warpStats.n + '\n' +
@@ -128,16 +139,33 @@ export async function start(opts) {
   });
 
   resetBtn.addEventListener('click', () => {
-    posAttr.array.set(restPositions);
-    posAttr.needsUpdate = true;
-    skin.geometry.computeBoundingSphere();
+    for (const t of warpTargets) {
+      t.attr.array.set(t.rest);
+      t.attr.needsUpdate = true;
+      t.mesh.geometry.computeBoundingSphere();
+    }
     setStatus('reset to rest pose');
   });
 }
 
+// All head-adjacent meshes that should ride along with the warped face.
+// Keyword match covers MH face sub-meshes, hair cards, lash/brow cards,
+// teeth, and tongue. Skips body, clothing, and anything further away.
+const HEAD_MESH_HINTS = ['face', 'head', 'hair', 'lash', 'brow', 'teeth', 'tongue', 'saliva', 'occlusion'];
+
+function collectHeadMeshes(root) {
+  const out = [];
+  root.traverse((obj) => {
+    if (!obj.isMesh) return;
+    const n = (obj.name || '').toLowerCase();
+    if (HEAD_MESH_HINTS.some((h) => n.includes(h))) out.push({ mesh: obj });
+  });
+  return out;
+}
+
 // --- core warp step ---
 
-function runWarp(mpLandmarks, anchors, skin, restPositions) {
+function runWarp(mpLandmarks, anchors, warpTargets) {
   // MediaPipe normalized landmarks vs MH world:
   //   MP raw +X = image right  = subject-left  = MH +X   (no flip)
   //   MP raw +Y = image down                   = MH -Y   (flip)
@@ -168,28 +196,29 @@ function runWarp(mpLandmarks, anchors, skin, restPositions) {
   }
   residual /= anchors.length;
 
-  // Apply to every vertex of the skin mesh.
-  const posAttr = skin.geometry.attributes.position;
-  const arr = posAttr.array;
-  let delta = 0;
+  // Apply to every vertex of every head-adjacent mesh.
+  let delta = 0, totalVerts = 0;
   const point = [0, 0, 0];
   const out = [0, 0, 0];
-  const n = arr.length / 3;
-  for (let i = 0; i < n; i++) {
-    point[0] = restPositions[i * 3 + 0];
-    point[1] = restPositions[i * 3 + 1];
-    point[2] = restPositions[i * 3 + 2];
-    applyWarp(warp, point, out);
-    arr[i * 3 + 0] = out[0];
-    arr[i * 3 + 1] = out[1];
-    arr[i * 3 + 2] = out[2];
-    const ddx = out[0] - point[0], ddy = out[1] - point[1], ddz = out[2] - point[2];
-    delta += Math.sqrt(ddx*ddx + ddy*ddy + ddz*ddz);
+  for (const t of warpTargets) {
+    const arr = t.attr.array;
+    const n = arr.length / 3;
+    for (let i = 0; i < n; i++) {
+      point[0] = t.rest[i * 3 + 0];
+      point[1] = t.rest[i * 3 + 1];
+      point[2] = t.rest[i * 3 + 2];
+      applyWarp(warp, point, out);
+      arr[i * 3 + 0] = out[0];
+      arr[i * 3 + 1] = out[1];
+      arr[i * 3 + 2] = out[2];
+      const ddx = out[0] - point[0], ddy = out[1] - point[1], ddz = out[2] - point[2];
+      delta += Math.sqrt(ddx*ddx + ddy*ddy + ddz*ddz);
+    }
+    totalVerts += n;
+    t.attr.needsUpdate = true;
+    t.mesh.geometry.computeBoundingSphere();
   }
-  delta /= n;
-
-  posAttr.needsUpdate = true;
-  skin.geometry.computeBoundingSphere();
+  delta /= Math.max(totalVerts, 1);
 
   return { n: anchors.length, meanResidual: residual, meanDelta: delta };
 }
