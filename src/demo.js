@@ -431,6 +431,14 @@ function computeAlignedTargetsPoseMatched(userLm, adaLm, anchors) {
 //
 // 3x3 symmetric solve per anchor. Cheap.
 function triangulateAnchorDeltas(samples, numAnchors) {
+  // Tikhonov ridge on the normal equations. Scales with the number of
+  // samples so a typical well-posed solve is untouched but the z
+  // direction cannot blow up when the user hasn't rotated much yet.
+  const ridge = 0.02 * samples.length;
+  // Anchors whose magnitude exceeds this are clamped. MP canonical
+  // face spans ~0.5 in normalized image units; identity deltas
+  // should be a small fraction of that.
+  const MAX_MAG = 0.15;
   const out = new Array(numAnchors);
   for (let i = 0; i < numAnchors; i++) {
     let A00=0, A01=0, A02=0, A11=0, A12=0, A22=0;
@@ -449,6 +457,7 @@ function triangulateAnchorDeltas(samples, numAnchors) {
       b1  += r01*d[0] + r11*d[1];
       b2  += r02*d[0] + r12*d[1];
     }
+    A00 += ridge; A11 += ridge; A22 += ridge;
     const det = A00*(A11*A22 - A12*A12)
               - A01*(A01*A22 - A12*A02)
               + A02*(A01*A12 - A11*A02);
@@ -459,11 +468,15 @@ function triangulateAnchorDeltas(samples, numAnchors) {
     const inv11 =  (A00*A22 - A02*A02) / det;
     const inv12 = -(A00*A12 - A01*A02) / det;
     const inv22 =  (A00*A11 - A01*A01) / det;
-    out[i] = [
-      inv00*b0 + inv01*b1 + inv02*b2,
-      inv01*b0 + inv11*b1 + inv12*b2,
-      inv02*b0 + inv12*b1 + inv22*b2,
-    ];
+    let dx = inv00*b0 + inv01*b1 + inv02*b2;
+    let dy = inv01*b0 + inv11*b1 + inv12*b2;
+    let dz = inv02*b0 + inv12*b1 + inv22*b2;
+    const m = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    if (m > MAX_MAG) {
+      const k = MAX_MAG / m;
+      dx *= k; dy *= k; dz *= k;
+    }
+    out[i] = [dx, dy, dz];
   }
   return out;
 }
