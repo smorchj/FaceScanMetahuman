@@ -56,22 +56,35 @@ export async function start(opts) {
     runBtn.disabled = true;
     setStatus('rendering Ada at detection resolution...');
 
-    // Render the current view into a square offscreen canvas sized
-    // for MediaPipe. We reuse the scene graph but a fresh renderer
-    // with a camera that matches the on-screen one, so the raycast
-    // math that follows uses identical intrinsics.
-    const offCanvas = document.createElement('canvas');
-    offCanvas.width = offCanvas.height = DETECT_SIZE;
-    const offRenderer = new THREE.WebGLRenderer({
-      canvas: offCanvas, antialias: true, preserveDrawingBuffer: true,
-    });
-    offRenderer.setPixelRatio(1);
-    offRenderer.setSize(DETECT_SIZE, DETECT_SIZE, false);
-    offRenderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Render with the SAME renderer that mounted the scene so we keep
+    // all the compiled MH materials + PMREM environment. Draw into an
+    // offscreen render target, read pixels back, blit into a 2D canvas
+    // (flipped Y to match canvas coords), hand that to MediaPipe.
     const detectCamera = three.camera.clone();
     detectCamera.aspect = 1;
     detectCamera.updateProjectionMatrix();
-    offRenderer.render(three.scene, detectCamera);
+    const rt = new THREE.WebGLRenderTarget(DETECT_SIZE, DETECT_SIZE, {
+      colorSpace: THREE.SRGBColorSpace,
+    });
+    three.renderer.setRenderTarget(rt);
+    three.renderer.render(three.scene, detectCamera);
+    three.renderer.setRenderTarget(null);
+    const pixels = new Uint8Array(DETECT_SIZE * DETECT_SIZE * 4);
+    three.renderer.readRenderTargetPixels(rt, 0, 0, DETECT_SIZE, DETECT_SIZE, pixels);
+    rt.dispose();
+
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = offCanvas.height = DETECT_SIZE;
+    const offCtx = offCanvas.getContext('2d');
+    const img = offCtx.createImageData(DETECT_SIZE, DETECT_SIZE);
+    // WebGL origin is bottom-left, canvas is top-left. Flip rows.
+    const rowBytes = DETECT_SIZE * 4;
+    for (let y = 0; y < DETECT_SIZE; y++) {
+      const src = (DETECT_SIZE - 1 - y) * rowBytes;
+      const dst = y * rowBytes;
+      img.data.set(pixels.subarray(src, src + rowBytes), dst);
+    }
+    offCtx.putImageData(img, 0, 0);
 
     // Show the thumbnail first so the operator can see what MP was
     // actually given, regardless of whether detection succeeds.
