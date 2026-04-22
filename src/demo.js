@@ -331,6 +331,16 @@ async function renderAdaPoseMatched(three, userRotation, fovDeg, landmarker) {
   return result.faceLandmarks[0];
 }
 
+// Z-boost for the per-anchor MH delta. MP's z coordinate encodes less
+// shape identity per unit than x/y do in practice; multiplying the
+// z-component of the delta pulls depth back into the warp. Tune in
+// testing; 1.0 = raw MP z, higher = exaggerated depth.
+const Z_BOOST = 3.0;
+
+// Delta magnitude stats, logged once per computeAligned call so we
+// can see whether z is just small or truly zero.
+let _deltaStatsSample = 0;
+
 // Per-frame aligned targets where the Procrustes rigid-align runs
 // against pose-matched Ada landmarks (not Ada-at-rest). The 2D MP
 // positions of user and Ada are both viewed from the same virtual
@@ -357,8 +367,20 @@ function computeAlignedTargetsPoseMatched(userLm, adaLm, anchors) {
   const deltas = userAlignedToAdaMp.map((p, i) => [
     p[0] - adaPts[i][0],
     p[1] - adaPts[i][1],
-    p[2] - adaPts[i][2],
+    (p[2] - adaPts[i][2]) * Z_BOOST,
   ]);
+
+  // Diagnostic: per-axis delta magnitudes once every ~1s.
+  if (_deltaStatsSample++ % 7 === 0) {
+    let mx = 0, my = 0, mz = 0;
+    for (const d of deltas) {
+      mx += Math.abs(d[0]); my += Math.abs(d[1]); mz += Math.abs(d[2]);
+    }
+    const n = deltas.length;
+    console.log('[demo] mean |delta|  x=' + (mx/n).toFixed(4)
+                + '  y=' + (my/n).toFixed(4)
+                + '  z=' + (mz/n).toFixed(4) + '  (z already x' + Z_BOOST + ')');
+  }
 
   // Scale MP-space delta into MH-space. Compute scale once by Procrustes
   // between Ada MP positions and MH rest positions.
