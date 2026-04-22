@@ -160,19 +160,21 @@ export async function start(opts) {
   const LIVE_UPDATE_EVERY_N = 3;
 
   let captureLoopId = null;
-  let captureSamples = [];
+  let triSamples = [];             // { R: 9-el row-major, deltas2D: N x [dx,dy] }
+  let cachedMpToMh = null;         // rigid+scale from MP canonical -> MH rest
 
   async function startCapture() {
     if (!latest) { setStatus('no face detected'); return; }
     captureBtn.textContent = 'Stop capture';
-    // One-time anchor build at fixed FOV.
     if (!cachedAnchors || Math.abs(cachedFovDeg - HARDCODED_FOV) > 0.01) {
       setStatus('building anchor map on Ada at FOV ' + HARDCODED_FOV + '°...');
-      cachedAnchors = await buildAnchorsAtFov(three, skin, imgLandmarker, HARDCODED_FOV);
-      cachedFovDeg = HARDCODED_FOV;
-      setStatus('anchors: ' + cachedAnchors.length + '. starting capture...');
+      const built = await buildAnchorsAtFov(three, skin, imgLandmarker, HARDCODED_FOV);
+      cachedAnchors = built.anchors;
+      cachedMpToMh  = built.mpToMh;
+      cachedFovDeg  = HARDCODED_FOV;
+      setStatus('anchors: ' + cachedAnchors.length + '. starting capture... turn your head slowly for best depth.');
     }
-    captureSamples = [];
+    triSamples = [];
     captureLoopId = setInterval(() => captureTick(), SAMPLE_INTERVAL_MS);
   }
 
@@ -182,30 +184,44 @@ export async function start(opts) {
       captureLoopId = null;
     }
     captureBtn.textContent = 'Start capture';
-    setStatus('capture stopped. samples: ' + captureSamples.length);
+    setStatus('capture stopped. samples: ' + triSamples.length);
   }
 
   async function captureTick() {
     if (!latest || !latestMatrix) return;
     try {
-      // Extract user's head rotation from MP matrix (column-major).
-      const userRotation = rotationFromMatrix16(latestMatrix);
-      // Render Ada with detect camera rotated by user's rotation.
-      const adaLm = await renderAdaPoseMatched(three, userRotation, HARDCODED_FOV, imgLandmarker);
+      const userQuat = rotationFromMatrix16(latestMatrix);
+      const adaLm = await renderAdaPoseMatched(three, userQuat, HARDCODED_FOV, imgLandmarker);
       if (!adaLm) return;
-      // Per-frame aligned targets using pose-matched Ada landmarks as
-      // the rigid source (instead of Ada-at-rest). Identity delta is
-      // cleaner because pose-induced perspective cancels.
-      const frameTargets = computeAlignedTargetsPoseMatched(latest, adaLm, cachedAnchors);
-      captureSamples.push(frameTargets);
-      if (captureSamples.length % LIVE_UPDATE_EVERY_N === 0) {
-        const avg = averageSamples(captureSamples);
-        const stats = runWarpFromTargets(avg, cachedAnchors, warpTargets);
-        setStatus('capturing (live)...\n'
-          + 'samples: ' + captureSamples.length + '\n'
-          + 'mean residual: ' + stats.meanResidual.toFixed(5) + ' m');
+
+      // Per-anchor 2D delta in MP space. We keep the y-flip because
+      // MP canonical Y is up but image Y is down, and our rotation
+      // matrix is in canonical (Y up) coordinates.
+      const deltas2D = cachedAnchors.map((a) => {
+        const u = latest[a.mpIdx];
+        const d = adaLm[a.mpIdx];
+        return [(u.x - d.x), -((u.y - d.y))];
+      });
+
+      // Rotation from canonical to camera space as a row-major 3x3.
+      const R4 = new THREE.Matrix4().makeRotationFromQuaternion(userQuat).elements;
+      const R = [
+        R4[0], R4[4], R4[8],
+        R4[1], R4[5], R4[9],
+        R4[2], R4[6], R4[10],
+      ];
+      triSamples.push({ R, deltas2D });
+
+      if (triSamples.length >= 3 && triSamples.length % LIVE_UPDATE_EVERY_N === 0) {
+        const deltas3D = triangulateAnchorDeltas(triSamples, cachedAnchors.length);
+        const targets = buildTargetsFromDeltas3D(deltas3D, cachedAnchors, cachedMpToMh);
+        const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
+        setStatus('capturing (triangulated)\n'
+          + 'samples: ' + triSamples.length + '\n'
+          + 'mean residual: ' + stats.meanResidual.toFixed(5));
       } else {
-        setStatus('capturing... samples: ' + captureSamples.length);
+        setStatus('capturing... samples: ' + triSamples.length
+          + (triSamples.length < 3 ? '  (need at least 3 angles)' : ''));
       }
     } catch (err) {
       console.error('[demo] captureTick error:', err);
@@ -396,6 +412,72 @@ function computeAlignedTargetsPoseMatched(userLm, adaLm, anchors) {
       rest[0] + scale * (R[0]*d[0] + R[1]*d[1] + R[2]*d[2]),
       rest[1] + scale * (R[3]*d[0] + R[4]*d[1] + R[5]*d[2]),
       rest[2] + scale * (R[6]*d[0] + R[7]*d[1] + R[8]*d[2]),
+    ];
+  });
+}
+
+// Multi-view triangulation of the per-anchor 3D identity delta.
+//
+// For frame k with user head rotation R_k (canonical -> camera space)
+// and observed per-anchor 2D delta d_k = [dx, dy]:
+//
+//   d_k ~= (top 2 rows of R_k) * D
+//
+// where D is the 3D identity delta in MP canonical space, constant
+// across frames. Stacking 2N rows gives an overdetermined system
+// solved by normal equations:
+//
+//   (AᵀA) D = Aᵀ b
+//
+// 3x3 symmetric solve per anchor. Cheap.
+function triangulateAnchorDeltas(samples, numAnchors) {
+  const out = new Array(numAnchors);
+  for (let i = 0; i < numAnchors; i++) {
+    let A00=0, A01=0, A02=0, A11=0, A12=0, A22=0;
+    let b0=0, b1=0, b2=0;
+    for (const s of samples) {
+      const R = s.R, d = s.deltas2D[i];
+      const r00=R[0], r01=R[1], r02=R[2];
+      const r10=R[3], r11=R[4], r12=R[5];
+      A00 += r00*r00 + r10*r10;
+      A01 += r00*r01 + r10*r11;
+      A02 += r00*r02 + r10*r12;
+      A11 += r01*r01 + r11*r11;
+      A12 += r01*r02 + r11*r12;
+      A22 += r02*r02 + r12*r12;
+      b0  += r00*d[0] + r10*d[1];
+      b1  += r01*d[0] + r11*d[1];
+      b2  += r02*d[0] + r12*d[1];
+    }
+    const det = A00*(A11*A22 - A12*A12)
+              - A01*(A01*A22 - A12*A02)
+              + A02*(A01*A12 - A11*A02);
+    if (Math.abs(det) < 1e-9) { out[i] = [0, 0, 0]; continue; }
+    const inv00 =  (A11*A22 - A12*A12) / det;
+    const inv01 = -(A01*A22 - A12*A02) / det;
+    const inv02 =  (A01*A12 - A11*A02) / det;
+    const inv11 =  (A00*A22 - A02*A02) / det;
+    const inv12 = -(A00*A12 - A01*A02) / det;
+    const inv22 =  (A00*A11 - A01*A01) / det;
+    out[i] = [
+      inv00*b0 + inv01*b1 + inv02*b2,
+      inv01*b0 + inv11*b1 + inv12*b2,
+      inv02*b0 + inv12*b1 + inv22*b2,
+    ];
+  }
+  return out;
+}
+
+// Convert triangulated MP-space deltas into MH-space warp targets by
+// applying the MP->MH rigid+scale computed once from Ada at rest.
+function buildTargetsFromDeltas3D(deltas3D, anchors, mpToMh) {
+  const s = mpToMh.scale, R = mpToMh.R;
+  return anchors.map((a, i) => {
+    const d = deltas3D[i];
+    return [
+      a.mhRest[0] + s * (R[0]*d[0] + R[1]*d[1] + R[2]*d[2]),
+      a.mhRest[1] + s * (R[3]*d[0] + R[4]*d[1] + R[5]*d[2]),
+      a.mhRest[2] + s * (R[6]*d[0] + R[7]*d[1] + R[8]*d[2]),
     ];
   });
 }
@@ -652,10 +734,6 @@ async function buildAnchorsAtFov(three, skin, landmarker, fovDeg) {
       if (d < bestDist) { bestDist = d; bestIdx = idx; }
     }
     rest.fromBufferAttribute(posAttr, bestIdx);
-    // Drop anchors that landed on the ear or back of the head. MH face
-    // landmarks sit at z ~ 0.05 .. 0.12 in the mesh's local frame; the
-    // ears and neck trail off to z ~ 0. Keeps the warp from pulling
-    // MP's wide face-silhouette landmarks into the MH ears.
     if (rest.z < 0.02) continue;
     if (seenVerts.has(bestIdx)) continue;
     seenVerts.add(bestIdx);
@@ -666,7 +744,17 @@ async function buildAnchorsAtFov(three, skin, landmarker, fovDeg) {
       mpIdx: i,
     });
   }
-  return out;
+
+  // Compute one-shot MP-canonical -> MH-rest rigid+scale for later use
+  // when converting triangulated deltas back into MH space.
+  const adaPtsRest = out.map((a) => {
+    const l = landmarks[a.mpIdx];
+    return [l.x - 0.5, -(l.y - 0.5), -l.z];
+  });
+  const mhRestPts = out.map((a) => a.mhRest);
+  const mpToMh = procrustesAlign(mhRestPts, adaPtsRest);
+
+  return { anchors: out, mpToMh };
 }
 
 function drawOverlay(ctx, canvas, landmarks, anchors) {
