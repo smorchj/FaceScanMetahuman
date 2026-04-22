@@ -146,66 +146,75 @@ export async function start(opts) {
   captureBtn.disabled = false;
   setStatus('ready. look at the camera and click capture.');
 
-  // Per-FOV cache of auto-generated anchors is declared above the
-  // tick loop so the overlay can use whichever set is active.
-  // Multi-frame capture: over CAPTURE_MS seconds, sample the user's
-  // rigid-aligned MP targets every SAMPLE_MS and average per-anchor
-  // after the window closes. User is expected to slowly rotate their
-  // head during capture; multi-angle averaging mitigates the
-  // single-frame bias where chin-up vs chin-down give different shapes.
-  const CAPTURE_MS = 3000;
-  const SAMPLE_MS = 100;
-  captureBtn.addEventListener('click', async () => {
-    if (!latest) { setStatus('no face detected right now'); return; }
-    if (!latestMatrix) { setStatus('no facial matrix yet; wait a beat and retry'); return; }
-    captureBtn.disabled = true;
-    try {
-      // Lock in FOV + anchor set on first valid frame.
-      const fovDeg = estimateWebcamFovDeg(latest, latestMatrix);
-      if (!cachedAnchors || Math.abs(fovDeg - cachedFovDeg) > 3) {
-        setStatus('FOV ' + fovDeg.toFixed(1) + '°; rebuilding anchors on Ada...');
-        cachedAnchors = await buildAnchorsAtFov(three, skin, imgLandmarker, fovDeg);
-        cachedFovDeg = fovDeg;
-      }
+  // Pose-matched multi-frame capture. Start toggles; Stop freezes.
+  // Each sample renders Ada with the detect camera rotated to match
+  // the user's current head rotation (from MP's facial transformation
+  // matrix), runs MP on her render, and uses those pose-matched
+  // ada landmarks as the Procrustes source. The alignment thus
+  // factors out pose geometry; identity is what remains.
+  //
+  // FOV is hardcoded at 60° during live capture to keep the loop
+  // fast. Swap to FOV detection later if needed.
+  const HARDCODED_FOV = 60;
+  const SAMPLE_INTERVAL_MS = 150;
+  const LIVE_UPDATE_EVERY_N = 3;
 
-      const samples = [];
-      const startT = performance.now();
-      await new Promise((resolve) => {
-        const id = setInterval(() => {
-          const elapsed = performance.now() - startT;
-          if (elapsed >= CAPTURE_MS) { clearInterval(id); resolve(); return; }
-          const remaining = ((CAPTURE_MS - elapsed) / 1000).toFixed(1);
-          setStatus('capturing... ' + remaining + 's left, '
-                    + samples.length + ' samples.\n'
-                    + 'Slowly turn your head: up, down, left, right.');
-          if (latest && latestMatrix) {
-            samples.push(computeAlignedTargets(latest, cachedAnchors));
-          }
-        }, SAMPLE_MS);
-      });
+  let captureLoopId = null;
+  let captureSamples = [];
 
-      if (!samples.length) {
-        setStatus('no valid frames captured');
-        captureBtn.disabled = false;
-        return;
-      }
-
-      // Per-anchor average across samples.
-      const avgTargets = averageSamples(samples);
-      const warpStats = runWarpFromTargets(avgTargets, cachedAnchors, warpTargets);
-      setStatus(
-        'warp applied.\n' +
-        'FOV: ' + cachedFovDeg.toFixed(1) + '°\n' +
-        'anchors: ' + warpStats.n + '\n' +
-        'samples averaged: ' + samples.length + '\n' +
-        'mean anchor residual: ' + warpStats.meanResidual.toFixed(5) + ' m\n' +
-        'mean vertex delta:    ' + warpStats.meanDelta.toFixed(5) + ' m'
-      );
-    } catch (err) {
-      console.error(err);
-      setStatus('warp failed: ' + (err.message || err));
+  async function startCapture() {
+    if (!latest) { setStatus('no face detected'); return; }
+    captureBtn.textContent = 'Stop capture';
+    // One-time anchor build at fixed FOV.
+    if (!cachedAnchors || Math.abs(cachedFovDeg - HARDCODED_FOV) > 0.01) {
+      setStatus('building anchor map on Ada at FOV ' + HARDCODED_FOV + '°...');
+      cachedAnchors = await buildAnchorsAtFov(three, skin, imgLandmarker, HARDCODED_FOV);
+      cachedFovDeg = HARDCODED_FOV;
+      setStatus('anchors: ' + cachedAnchors.length + '. starting capture...');
     }
-    captureBtn.disabled = false;
+    captureSamples = [];
+    captureLoopId = setInterval(() => captureTick(), SAMPLE_INTERVAL_MS);
+  }
+
+  function stopCapture() {
+    if (captureLoopId !== null) {
+      clearInterval(captureLoopId);
+      captureLoopId = null;
+    }
+    captureBtn.textContent = 'Start capture';
+    setStatus('capture stopped. samples: ' + captureSamples.length);
+  }
+
+  async function captureTick() {
+    if (!latest || !latestMatrix) return;
+    try {
+      // Extract user's head rotation from MP matrix (column-major).
+      const userRotation = rotationFromMatrix16(latestMatrix);
+      // Render Ada with detect camera rotated by user's rotation.
+      const adaLm = await renderAdaPoseMatched(three, userRotation, HARDCODED_FOV, imgLandmarker);
+      if (!adaLm) return;
+      // Per-frame aligned targets using pose-matched Ada landmarks as
+      // the rigid source (instead of Ada-at-rest). Identity delta is
+      // cleaner because pose-induced perspective cancels.
+      const frameTargets = computeAlignedTargetsPoseMatched(latest, adaLm, cachedAnchors);
+      captureSamples.push(frameTargets);
+      if (captureSamples.length % LIVE_UPDATE_EVERY_N === 0) {
+        const avg = averageSamples(captureSamples);
+        const stats = runWarpFromTargets(avg, cachedAnchors, warpTargets);
+        setStatus('capturing (live)...\n'
+          + 'samples: ' + captureSamples.length + '\n'
+          + 'mean residual: ' + stats.meanResidual.toFixed(5) + ' m');
+      } else {
+        setStatus('capturing... samples: ' + captureSamples.length);
+      }
+    } catch (err) {
+      console.error('[demo] captureTick error:', err);
+    }
+  }
+
+  captureBtn.addEventListener('click', () => {
+    if (captureLoopId === null) startCapture();
+    else stopCapture();
   });
 
   resetBtn.addEventListener('click', () => {
@@ -257,6 +266,117 @@ function collectHeadMeshes(root) {
 }
 
 // --- core warp step ---
+
+// Extract the rotation-only quaternion from a 16-element column-major
+// 4x4 matrix (MediaPipe facial transformation format).
+function rotationFromMatrix16(m) {
+  const mat = new THREE.Matrix4().fromArray(m);
+  const q = new THREE.Quaternion();
+  const pos = new THREE.Vector3();
+  const scl = new THREE.Vector3();
+  mat.decompose(pos, q, scl);
+  return q;
+}
+
+// Render Ada with the detect camera rotated to match the user's head
+// rotation. Run MP on the rendered frame. Returns the 478 landmarks
+// (in MP normalized image space) or null if detection failed.
+async function renderAdaPoseMatched(three, userRotation, fovDeg, landmarker) {
+  const DETECT = 512; // smaller than one-shot anchor build; live loop
+  // Detect camera sits at Ada's face looking at it, then is orbited
+  // around Ada's face center by the user's rotation. With Ada at rest
+  // and the camera rotated by userRotation^-1 around the face pivot,
+  // the view appears as if Ada rotated her head by userRotation.
+  const cam = new THREE.PerspectiveCamera(fovDeg, 1, 0.01, 20);
+
+  // Face center comes from the three.camera's current target (set at
+  // frameHead); here we reuse its pos/target relationship.
+  const target = three.controls ? three.controls.target.clone()
+                                : new THREE.Vector3(0, 1.5, 0);
+  const restDist = three.camera.position.distanceTo(target);
+  const restOffset = new THREE.Vector3(0, 0, restDist);
+
+  // Rotate rest offset by the INVERSE of user's rotation around the face.
+  const invRotation = userRotation.clone().invert();
+  restOffset.applyQuaternion(invRotation);
+  cam.position.copy(target).add(restOffset);
+  cam.up.set(0, 1, 0);
+  cam.lookAt(target);
+  cam.updateMatrixWorld();
+  cam.updateProjectionMatrix();
+
+  const rt = new THREE.WebGLRenderTarget(DETECT, DETECT, {
+    colorSpace: THREE.SRGBColorSpace,
+  });
+  three.renderer.setRenderTarget(rt);
+  three.renderer.render(three.scene, cam);
+  three.renderer.setRenderTarget(null);
+  const pixels = new Uint8Array(DETECT * DETECT * 4);
+  three.renderer.readRenderTargetPixels(rt, 0, 0, DETECT, DETECT, pixels);
+  rt.dispose();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = DETECT;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(DETECT, DETECT);
+  const rowBytes = DETECT * 4;
+  for (let y = 0; y < DETECT; y++) {
+    const src = (DETECT - 1 - y) * rowBytes;
+    img.data.set(pixels.subarray(src, src + rowBytes), y * rowBytes);
+  }
+  ctx.putImageData(img, 0, 0);
+
+  const result = landmarker.detect(canvas);
+  if (!result.faceLandmarks || !result.faceLandmarks[0]) return null;
+  return result.faceLandmarks[0];
+}
+
+// Per-frame aligned targets where the Procrustes rigid-align runs
+// against pose-matched Ada landmarks (not Ada-at-rest). The 2D MP
+// positions of user and Ada are both viewed from the same virtual
+// angle, so their difference is pure identity. After Procrustes
+// alignment we map each aligned-user 2D position into 3D MH space
+// using a fixed scale derived from anchor rest positions once.
+function computeAlignedTargetsPoseMatched(userLm, adaLm, anchors) {
+  // User and Ada landmarks in MP's 3D-ish space.
+  const userPts = anchors.map((a) => {
+    const l = userLm[a.mpIdx];
+    return [l.x - 0.5, -(l.y - 0.5), -l.z];
+  });
+  const adaPts = anchors.map((a) => {
+    const l = adaLm[a.mpIdx];
+    return [l.x - 0.5, -(l.y - 0.5), -l.z];
+  });
+  // Rigid-align user MP points to Ada MP points (pose-matched) so
+  // translation / uniform scale cancel out. Identity is the non-rigid
+  // residual after alignment.
+  const userToAda = procrustesAlign(adaPts, userPts);
+  const userAlignedToAdaMp = userPts.map((p) => applyRigid(userToAda, p, [0, 0, 0]));
+
+  // Deltas in MP space per anchor.
+  const deltas = userAlignedToAdaMp.map((p, i) => [
+    p[0] - adaPts[i][0],
+    p[1] - adaPts[i][1],
+    p[2] - adaPts[i][2],
+  ]);
+
+  // Scale MP-space delta into MH-space. Compute scale once by Procrustes
+  // between Ada MP positions and MH rest positions.
+  const mhRestPts = anchors.map((a) => a.mhRest);
+  const mpToMh = procrustesAlign(mhRestPts, adaPts);
+  const scale = mpToMh.scale;
+  const R = mpToMh.R;
+
+  // Target = MH rest + rotated scaled delta.
+  return mhRestPts.map((rest, i) => {
+    const d = deltas[i];
+    return [
+      rest[0] + scale * (R[0]*d[0] + R[1]*d[1] + R[2]*d[2]),
+      rest[1] + scale * (R[3]*d[0] + R[4]*d[1] + R[5]*d[2]),
+      rest[2] + scale * (R[6]*d[0] + R[7]*d[1] + R[8]*d[2]),
+    ];
+  });
+}
 
 // Per-anchor average of aligned targets across N frames. Each sample
 // is an array of [x,y,z] per anchor. Output is same-shape averaged.
