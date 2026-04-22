@@ -221,6 +221,10 @@ export async function start(opts) {
       const userQuat = rotationFromMatrix16(latestMatrix);
       if (!userQuatRef) userQuatRef = userQuat.clone();
       const userDeltaQuat = userQuatRef.clone().invert().premultiply(userQuat);
+      // MP's pitch axis points opposite to MH's pitch axis. Negating x
+      // on the delta flips pitch direction; leaves yaw and roll alone.
+      userDeltaQuat.x = -userDeltaQuat.x;
+      userDeltaQuat.normalize();
 
       // Apply delta to Ada's head bone.
       if (headBone && headBoneRestQuat) {
