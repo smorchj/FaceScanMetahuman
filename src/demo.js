@@ -46,18 +46,25 @@ export async function start(opts) {
   // Pair up MH rest anchors with MediaPipe indices. Auto-generated
   // anchor files carry `mpIndex` directly; the legacy hand-picked file
   // relies on the name -> index lookup in mp_indices.js.
-  const anchors = anchorsData.anchors.map((a) => {
+  // Dedup on MH vertex index: auto-map sometimes lands two MP
+  // landmarks on the same MH vert (e.g. adjacent inner-lip indices),
+  // which makes the RBF kernel singular. First pick wins.
+  const seen = new Set();
+  const anchors = [];
+  for (const a of anchorsData.anchors) {
     const mpIdx = (a.mpIndex !== undefined) ? a.mpIndex : MP_INDICES[a.name];
-    if (mpIdx === undefined) {
-      console.warn('[demo] no MP index for', a.name, '-- will skip');
-    }
-    return {
+    if (mpIdx === undefined) continue;
+    if (seen.has(a.vertexIndex)) continue;
+    seen.add(a.vertexIndex);
+    anchors.push({
       name: a.name,
       mhIdx: a.vertexIndex,
       mhRest: a.restPosition.slice(),
       mpIdx,
-    };
-  }).filter((a) => a.mpIdx !== undefined);
+    });
+  }
+  console.log('[demo] anchors after dedup:', anchors.length,
+              'of', anchorsData.anchors.length);
 
   frameHead(three.gltf.scene, three.camera, three.controls);
 

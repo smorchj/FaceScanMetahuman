@@ -1,0 +1,5266 @@
+{
+  "version": 2,
+  "characterId": "ada",
+  "source": "auto-anchors (MediaPipe on MH render)",
+  "skinMesh": "Ada_FaceMesh_LOD0_1",
+  "anchors": [
+    {
+      "name": "mp_000",
+      "mpIndex": 0,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17086,
+      "restPosition": [
+        -0.00012417137622833252,
+        1.4324662685394287,
+        0.11432873457670212
+      ]
+    },
+    {
+      "name": "mp_001",
+      "mpIndex": 1,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19671,
+      "restPosition": [
+        -0.000060304999351501465,
+        1.452096939086914,
+        0.11779921501874924
+      ]
+    },
+    {
+      "name": "mp_002",
+      "mpIndex": 2,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19728,
+      "restPosition": [
+        -0.00012417137622833252,
+        1.4459223747253418,
+        0.10764326900243759
+      ]
+    },
+    {
+      "name": "mp_003",
+      "mpIndex": 3,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12214,
+      "restPosition": [
+        -0.0050850361585617065,
+        1.470726728439331,
+        0.11028338223695755
+      ]
+    },
+    {
+      "name": "mp_004",
+      "mpIndex": 4,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19508,
+      "restPosition": [
+        -0.00008158385753631592,
+        1.4578667879104614,
+        0.11933218687772751
+      ]
+    },
+    {
+      "name": "mp_005",
+      "mpIndex": 5,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16113,
+      "restPosition": [
+        -0.00010287761688232422,
+        1.4654464721679688,
+        0.11626624315977097
+      ]
+    },
+    {
+      "name": "mp_006",
+      "mpIndex": 6,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9365,
+      "restPosition": [
+        -0.00010287761688232422,
+        1.4837356805801392,
+        0.10349147766828537
+      ]
+    },
+    {
+      "name": "mp_007",
+      "mpIndex": 7,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24235,
+      "restPosition": [
+        -0.04062017798423767,
+        1.488866925239563,
+        0.08379704505205154
+      ]
+    },
+    {
+      "name": "mp_008",
+      "mpIndex": 8,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12435,
+      "restPosition": [
+        -0.000060304999351501465,
+        1.4995551109313965,
+        0.10193721204996109
+      ]
+    },
+    {
+      "name": "mp_009",
+      "mpIndex": 9,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12452,
+      "restPosition": [
+        -0.000039011240005493164,
+        1.507667064666748,
+        0.10361922532320023
+      ]
+    },
+    {
+      "name": "mp_010",
+      "mpIndex": 10,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9427,
+      "restPosition": [
+        -0.000017717480659484863,
+        1.536985158920288,
+        0.09842414408922195
+      ]
+    },
+    {
+      "name": "mp_011",
+      "mpIndex": 11,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17059,
+      "restPosition": [
+        -0.00016675889492034912,
+        1.429655909538269,
+        0.1142861470580101
+      ]
+    },
+    {
+      "name": "mp_012",
+      "mpIndex": 12,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17030,
+      "restPosition": [
+        -0.00018805265426635742,
+        1.426291823387146,
+        0.11277446895837784
+      ]
+    },
+    {
+      "name": "mp_013",
+      "mpIndex": 13,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17015,
+      "restPosition": [
+        -0.00020933151245117188,
+        1.4244821071624756,
+        0.11090084165334702
+      ]
+    },
+    {
+      "name": "mp_014",
+      "mpIndex": 14,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17015,
+      "restPosition": [
+        -0.00020933151245117188,
+        1.4244821071624756,
+        0.11090084165334702
+      ]
+    },
+    {
+      "name": "mp_015",
+      "mpIndex": 15,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5007,
+      "restPosition": [
+        -0.00016675889492034912,
+        1.4203941822052002,
+        0.11083696037530899
+      ]
+    },
+    {
+      "name": "mp_016",
+      "mpIndex": 16,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5038,
+      "restPosition": [
+        -0.00018805265426635742,
+        1.4164766073226929,
+        0.11207184940576553
+      ]
+    },
+    {
+      "name": "mp_017",
+      "mpIndex": 17,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5217,
+      "restPosition": [
+        -0.00014546513557434082,
+        1.4118350744247437,
+        0.11102858930826187
+      ]
+    },
+    {
+      "name": "mp_018",
+      "mpIndex": 18,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5256,
+      "restPosition": [
+        -0.00010287761688232422,
+        1.4080452919006348,
+        0.10283144563436508
+      ]
+    },
+    {
+      "name": "mp_019",
+      "mpIndex": 19,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19662,
+      "restPosition": [
+        -0.00008158385753631592,
+        1.4489457607269287,
+        0.11447777599096298
+      ]
+    },
+    {
+      "name": "mp_020",
+      "mpIndex": 20,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20027,
+      "restPosition": [
+        -0.005361825227737427,
+        1.4492225646972656,
+        0.10572705417871475
+      ]
+    },
+    {
+      "name": "mp_021",
+      "mpIndex": 21,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 2857,
+      "restPosition": [
+        -0.06425349414348602,
+        1.514970064163208,
+        0.05017811805009842
+      ]
+    },
+    {
+      "name": "mp_022",
+      "mpIndex": 22,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11846,
+      "restPosition": [
+        -0.024204596877098083,
+        1.4826072454452515,
+        0.09301616996526718
+      ]
+    },
+    {
+      "name": "mp_023",
+      "mpIndex": 23,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12044,
+      "restPosition": [
+        -0.029868081212043762,
+        1.4821175336837769,
+        0.09335682541131973
+      ]
+    },
+    {
+      "name": "mp_024",
+      "mpIndex": 24,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19435,
+      "restPosition": [
+        -0.036085136234760284,
+        1.482628583908081,
+        0.09203676134347916
+      ]
+    },
+    {
+      "name": "mp_025",
+      "mpIndex": 25,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9161,
+      "restPosition": [
+        -0.043366752564907074,
+        1.4862693548202515,
+        0.08709719032049179
+      ]
+    },
+    {
+      "name": "mp_026",
+      "mpIndex": 26,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9203,
+      "restPosition": [
+        -0.01988247036933899,
+        1.483842134475708,
+        0.09242000430822372
+      ]
+    },
+    {
+      "name": "mp_027",
+      "mpIndex": 27,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3171,
+      "restPosition": [
+        -0.0342966690659523,
+        1.5009816884994507,
+        0.09410201758146286
+      ]
+    },
+    {
+      "name": "mp_028",
+      "mpIndex": 28,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3176,
+      "restPosition": [
+        -0.02701505273580551,
+        1.5008113384246826,
+        0.09484720975160599
+      ]
+    },
+    {
+      "name": "mp_029",
+      "mpIndex": 29,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3230,
+      "restPosition": [
+        -0.04006660729646683,
+        1.5009816884994507,
+        0.09195160120725632
+      ]
+    },
+    {
+      "name": "mp_030",
+      "mpIndex": 30,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7781,
+      "restPosition": [
+        -0.0441119447350502,
+        1.498213768005371,
+        0.08886436372995377
+      ]
+    },
+    {
+      "name": "mp_031",
+      "mpIndex": 31,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19223,
+      "restPosition": [
+        -0.048072122037410736,
+        1.48273503780365,
+        0.0820937380194664
+      ]
+    },
+    {
+      "name": "mp_032",
+      "mpIndex": 32,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15363,
+      "restPosition": [
+        -0.0210534930229187,
+        1.3997416496276855,
+        0.09403815120458603
+      ]
+    },
+    {
+      "name": "mp_033",
+      "mpIndex": 33,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8634,
+      "restPosition": [
+        -0.042749300599098206,
+        1.4910598993301392,
+        0.08586230129003525
+      ]
+    },
+    {
+      "name": "mp_034",
+      "mpIndex": 34,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6884,
+      "restPosition": [
+        -0.06480706483125687,
+        1.4880578517913818,
+        0.054415084421634674
+      ]
+    },
+    {
+      "name": "mp_035",
+      "mpIndex": 35,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19019,
+      "restPosition": [
+        -0.05480016767978668,
+        1.4878236055374146,
+        0.07368368655443192
+      ]
+    },
+    {
+      "name": "mp_036",
+      "mpIndex": 36,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15845,
+      "restPosition": [
+        -0.029229342937469482,
+        1.4573132991790771,
+        0.09627372771501541
+      ]
+    },
+    {
+      "name": "mp_037",
+      "mpIndex": 37,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18185,
+      "restPosition": [
+        -0.0069160908460617065,
+        1.4339141845703125,
+        0.11311512440443039
+      ]
+    },
+    {
+      "name": "mp_038",
+      "mpIndex": 38,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17041,
+      "restPosition": [
+        -0.006213471293449402,
+        1.426760196685791,
+        0.11166732758283615
+      ]
+    },
+    {
+      "name": "mp_039",
+      "mpIndex": 39,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18167,
+      "restPosition": [
+        -0.014751285314559937,
+        1.431614637374878,
+        0.10955948382616043
+      ]
+    },
+    {
+      "name": "mp_040",
+      "mpIndex": 40,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18158,
+      "restPosition": [
+        -0.019030824303627014,
+        1.4289532899856567,
+        0.10632320493459702
+      ]
+    },
+    {
+      "name": "mp_041",
+      "mpIndex": 41,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17979,
+      "restPosition": [
+        -0.011727914214134216,
+        1.426015019416809,
+        0.10904849320650101
+      ]
+    },
+    {
+      "name": "mp_042",
+      "mpIndex": 42,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18128,
+      "restPosition": [
+        -0.016582325100898743,
+        1.4252272844314575,
+        0.1056206002831459
+      ]
+    },
+    {
+      "name": "mp_043",
+      "mpIndex": 43,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18457,
+      "restPosition": [
+        -0.025907903909683228,
+        1.418839931488037,
+        0.0960182324051857
+      ]
+    },
+    {
+      "name": "mp_044",
+      "mpIndex": 44,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19547,
+      "restPosition": [
+        -0.004978582262992859,
+        1.4515433311462402,
+        0.11598945409059525
+      ]
+    },
+    {
+      "name": "mp_045",
+      "mpIndex": 45,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19522,
+      "restPosition": [
+        -0.005425706505775452,
+        1.4579520225524902,
+        0.11792696267366409
+      ]
+    },
+    {
+      "name": "mp_046",
+      "mpIndex": 46,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8824,
+      "restPosition": [
+        -0.05273491144180298,
+        1.5022591352462769,
+        0.08081626147031784
+      ]
+    },
+    {
+      "name": "mp_047",
+      "mpIndex": 47,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11895,
+      "restPosition": [
+        -0.016859114170074463,
+        1.472089409828186,
+        0.09708280116319656
+      ]
+    },
+    {
+      "name": "mp_048",
+      "mpIndex": 48,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16053,
+      "restPosition": [
+        -0.01751914620399475,
+        1.4538853168487549,
+        0.1078987643122673
+      ]
+    },
+    {
+      "name": "mp_049",
+      "mpIndex": 49,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16070,
+      "restPosition": [
+        -0.018285632133483887,
+        1.4566106796264648,
+        0.10385342687368393
+      ]
+    },
+    {
+      "name": "mp_050",
+      "mpIndex": 50,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19115,
+      "restPosition": [
+        -0.04551716893911362,
+        1.458803653717041,
+        0.08952439576387405
+      ]
+    },
+    {
+      "name": "mp_051",
+      "mpIndex": 51,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16262,
+      "restPosition": [
+        -0.005404412746429443,
+        1.4642541408538818,
+        0.11535071581602097
+      ]
+    },
+    {
+      "name": "mp_052",
+      "mpIndex": 52,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3202,
+      "restPosition": [
+        -0.03938528150320053,
+        1.5089232921600342,
+        0.09344198554754257
+      ]
+    },
+    {
+      "name": "mp_053",
+      "mpIndex": 53,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7745,
+      "restPosition": [
+        -0.047710172832012177,
+        1.5061980485916138,
+        0.0873526856303215
+      ]
+    },
+    {
+      "name": "mp_054",
+      "mpIndex": 54,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8898,
+      "restPosition": [
+        -0.05784481763839722,
+        1.5263822078704834,
+        0.06365550309419632
+      ]
+    },
+    {
+      "name": "mp_055",
+      "mpIndex": 55,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9396,
+      "restPosition": [
+        -0.011898249387741089,
+        1.5021952390670776,
+        0.10021261125802994
+      ]
+    },
+    {
+      "name": "mp_056",
+      "mpIndex": 56,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7836,
+      "restPosition": [
+        -0.021266400814056396,
+        1.497277021408081,
+        0.09363361448049545
+      ]
+    },
+    {
+      "name": "mp_057",
+      "mpIndex": 57,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15523,
+      "restPosition": [
+        -0.029974542558193207,
+        1.4247162342071533,
+        0.09616727381944656
+      ]
+    },
+    {
+      "name": "mp_058",
+      "mpIndex": 58,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6232,
+      "restPosition": [
+        -0.057631902396678925,
+        1.4294004440307617,
+        0.05079556256532669
+      ]
+    },
+    {
+      "name": "mp_059",
+      "mpIndex": 59,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19882,
+      "restPosition": [
+        -0.013644129037857056,
+        1.4502445459365845,
+        0.10483282059431076
+      ]
+    },
+    {
+      "name": "mp_060",
+      "mpIndex": 60,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20036,
+      "restPosition": [
+        -0.009087800979614258,
+        1.4483709335327148,
+        0.10372567921876907
+      ]
+    },
+    {
+      "name": "mp_061",
+      "mpIndex": 61,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18427,
+      "restPosition": [
+        -0.025247879326343536,
+        1.423247218132019,
+        0.09772153943777084
+      ]
+    },
+    {
+      "name": "mp_062",
+      "mpIndex": 62,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18390,
+      "restPosition": [
+        -0.02326779067516327,
+        1.4237369298934937,
+        0.09872222691774368
+      ]
+    },
+    {
+      "name": "mp_063",
+      "mpIndex": 63,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7731,
+      "restPosition": [
+        -0.05013737827539444,
+        1.512244701385498,
+        0.081646628677845
+      ]
+    },
+    {
+      "name": "mp_064",
+      "mpIndex": 64,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16010,
+      "restPosition": [
+        -0.018136590719223022,
+        1.4509471654891968,
+        0.10585480183362961
+      ]
+    },
+    {
+      "name": "mp_065",
+      "mpIndex": 65,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3146,
+      "restPosition": [
+        -0.028782226145267487,
+        1.5070710182189941,
+        0.0973808690905571
+      ]
+    },
+    {
+      "name": "mp_066",
+      "mpIndex": 66,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3128,
+      "restPosition": [
+        -0.03020874410867691,
+        1.5127983093261719,
+        0.09818994253873825
+      ]
+    },
+    {
+      "name": "mp_067",
+      "mpIndex": 67,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 2980,
+      "restPosition": [
+        -0.03363663703203201,
+        1.5374536514282227,
+        0.08897081762552261
+      ]
+    },
+    {
+      "name": "mp_068",
+      "mpIndex": 68,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7725,
+      "restPosition": [
+        -0.0541614294052124,
+        1.517737865447998,
+        0.07310882955789566
+      ]
+    },
+    {
+      "name": "mp_069",
+      "mpIndex": 69,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3110,
+      "restPosition": [
+        -0.030464239418506622,
+        1.5253175497055054,
+        0.09437880665063858
+      ]
+    },
+    {
+      "name": "mp_070",
+      "mpIndex": 70,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8849,
+      "restPosition": [
+        -0.05622667819261551,
+        1.5055592060089111,
+        0.07174617797136307
+      ]
+    },
+    {
+      "name": "mp_071",
+      "mpIndex": 71,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18935,
+      "restPosition": [
+        -0.0603146031498909,
+        1.5112440586090088,
+        0.06090892106294632
+      ]
+    },
+    {
+      "name": "mp_072",
+      "mpIndex": 72,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17801,
+      "restPosition": [
+        -0.006681889295578003,
+        1.4306565523147583,
+        0.1129235103726387
+      ]
+    },
+    {
+      "name": "mp_073",
+      "mpIndex": 73,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18009,
+      "restPosition": [
+        -0.012728601694107056,
+        1.429038405418396,
+        0.11019822210073471
+      ]
+    },
+    {
+      "name": "mp_074",
+      "mpIndex": 74,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18138,
+      "restPosition": [
+        -0.018008843064308167,
+        1.4271222352981567,
+        0.10636579245328903
+      ]
+    },
+    {
+      "name": "mp_075",
+      "mpIndex": 75,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19936,
+      "restPosition": [
+        -0.011834368109703064,
+        1.4488179683685303,
+        0.10300176590681076
+      ]
+    },
+    {
+      "name": "mp_076",
+      "mpIndex": 76,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18388,
+      "restPosition": [
+        -0.02397039532661438,
+        1.4234814643859863,
+        0.09814735502004623
+      ]
+    },
+    {
+      "name": "mp_077",
+      "mpIndex": 77,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18515,
+      "restPosition": [
+        -0.02171352505683899,
+        1.4217355251312256,
+        0.09810478240251541
+      ]
+    },
+    {
+      "name": "mp_078",
+      "mpIndex": 78,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18387,
+      "restPosition": [
+        -0.022778093814849854,
+        1.4235665798187256,
+        0.09863706678152084
+      ]
+    },
+    {
+      "name": "mp_079",
+      "mpIndex": 79,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19861,
+      "restPosition": [
+        -0.010940134525299072,
+        1.452671766281128,
+        0.11258284002542496
+      ]
+    },
+    {
+      "name": "mp_080",
+      "mpIndex": 80,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18027,
+      "restPosition": [
+        -0.014815151691436768,
+        1.424333095550537,
+        0.10555671900510788
+      ]
+    },
+    {
+      "name": "mp_081",
+      "mpIndex": 81,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17974,
+      "restPosition": [
+        -0.01089756190776825,
+        1.4244821071624756,
+        0.10764326900243759
+      ]
+    },
+    {
+      "name": "mp_082",
+      "mpIndex": 82,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17036,
+      "restPosition": [
+        -0.005702480673789978,
+        1.424737572669983,
+        0.10998531430959702
+      ]
+    },
+    {
+      "name": "mp_083",
+      "mpIndex": 83,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5399,
+      "restPosition": [
+        -0.007618695497512817,
+        1.407662034034729,
+        0.10257595032453537
+      ]
+    },
+    {
+      "name": "mp_084",
+      "mpIndex": 84,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5272,
+      "restPosition": [
+        -0.008236154913902283,
+        1.4123886823654175,
+        0.1101769283413887
+      ]
+    },
+    {
+      "name": "mp_085",
+      "mpIndex": 85,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5105,
+      "restPosition": [
+        -0.007639989256858826,
+        1.4169024229049683,
+        0.11156085878610611
+      ]
+    },
+    {
+      "name": "mp_086",
+      "mpIndex": 86,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5080,
+      "restPosition": [
+        -0.006788343191146851,
+        1.4207561016082764,
+        0.11032596975564957
+      ]
+    },
+    {
+      "name": "mp_087",
+      "mpIndex": 87,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17036,
+      "restPosition": [
+        -0.005702480673789978,
+        1.424737572669983,
+        0.10998531430959702
+      ]
+    },
+    {
+      "name": "mp_088",
+      "mpIndex": 88,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18029,
+      "restPosition": [
+        -0.015539050102233887,
+        1.4240988492965698,
+        0.10481152683496475
+      ]
+    },
+    {
+      "name": "mp_089",
+      "mpIndex": 89,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5329,
+      "restPosition": [
+        -0.016667500138282776,
+        1.422629714012146,
+        0.1024269089102745
+      ]
+    },
+    {
+      "name": "mp_090",
+      "mpIndex": 90,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15235,
+      "restPosition": [
+        -0.01845596730709076,
+        1.4200109243392944,
+        0.10291660577058792
+      ]
+    },
+    {
+      "name": "mp_091",
+      "mpIndex": 91,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15265,
+      "restPosition": [
+        -0.01960568130016327,
+        1.4180095195770264,
+        0.10249077528715134
+      ]
+    },
+    {
+      "name": "mp_092",
+      "mpIndex": 92,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15722,
+      "restPosition": [
+        -0.022948414087295532,
+        1.4360007047653198,
+        0.10187333077192307
+      ]
+    },
+    {
+      "name": "mp_093",
+      "mpIndex": 93,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6388,
+      "restPosition": [
+        -0.06429607421159744,
+        1.4621038436889648,
+        0.05684228986501694
+      ]
+    },
+    {
+      "name": "mp_094",
+      "mpIndex": 94,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19693,
+      "restPosition": [
+        -0.00012417137622833252,
+        1.447178602218628,
+        0.11068791896104813
+      ]
+    },
+    {
+      "name": "mp_095",
+      "mpIndex": 95,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18119,
+      "restPosition": [
+        -0.018988236784934998,
+        1.4240349531173706,
+        0.10227786749601364
+      ]
+    },
+    {
+      "name": "mp_096",
+      "mpIndex": 96,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18108,
+      "restPosition": [
+        -0.020180553197860718,
+        1.4228214025497437,
+        0.0980621948838234
+      ]
+    },
+    {
+      "name": "mp_097",
+      "mpIndex": 97,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20040,
+      "restPosition": [
+        -0.00798065960407257,
+        1.4459223747253418,
+        0.1049179807305336
+      ]
+    },
+    {
+      "name": "mp_098",
+      "mpIndex": 98,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19891,
+      "restPosition": [
+        -0.0153474360704422,
+        1.447072148323059,
+        0.1019585058093071
+      ]
+    },
+    {
+      "name": "mp_099",
+      "mpIndex": 99,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20035,
+      "restPosition": [
+        -0.008044525980949402,
+        1.4472424983978271,
+        0.10459861904382706
+      ]
+    },
+    {
+      "name": "mp_100",
+      "mpIndex": 100,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11978,
+      "restPosition": [
+        -0.02354457974433899,
+        1.467958927154541,
+        0.09529433399438858
+      ]
+    },
+    {
+      "name": "mp_101",
+      "mpIndex": 101,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19152,
+      "restPosition": [
+        -0.03248690813779831,
+        1.4644458293914795,
+        0.09384652227163315
+      ]
+    },
+    {
+      "name": "mp_102",
+      "mpIndex": 102,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15998,
+      "restPosition": [
+        -0.019307613372802734,
+        1.453310489654541,
+        0.10347018390893936
+      ]
+    },
+    {
+      "name": "mp_103",
+      "mpIndex": 103,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7682,
+      "restPosition": [
+        -0.04805082827806473,
+        1.5318326950073242,
+        0.07689867168664932
+      ]
+    },
+    {
+      "name": "mp_104",
+      "mpIndex": 104,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3041,
+      "restPosition": [
+        -0.044580355286598206,
+        1.5243169069290161,
+        0.08390349894762039
+      ]
+    },
+    {
+      "name": "mp_105",
+      "mpIndex": 105,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3208,
+      "restPosition": [
+        -0.04230218380689621,
+        1.51388418674469,
+        0.08988634496927261
+      ]
+    },
+    {
+      "name": "mp_106",
+      "mpIndex": 106,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15277,
+      "restPosition": [
+        -0.021117374300956726,
+        1.4144965410232544,
+        0.09997840970754623
+      ]
+    },
+    {
+      "name": "mp_107",
+      "mpIndex": 107,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3402,
+      "restPosition": [
+        -0.014559656381607056,
+        1.510669231414795,
+        0.10274627059698105
+      ]
+    },
+    {
+      "name": "mp_108",
+      "mpIndex": 108,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3410,
+      "restPosition": [
+        -0.0153474360704422,
+        1.5250407457351685,
+        0.09995711594820023
+      ]
+    },
+    {
+      "name": "mp_109",
+      "mpIndex": 109,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3302,
+      "restPosition": [
+        -0.019371479749679565,
+        1.5365381240844727,
+        0.09627372771501541
+      ]
+    },
+    {
+      "name": "mp_110",
+      "mpIndex": 110,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19447,
+      "restPosition": [
+        -0.04036468267440796,
+        1.4842041730880737,
+        0.08988634496927261
+      ]
+    },
+    {
+      "name": "mp_111",
+      "mpIndex": 111,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19184,
+      "restPosition": [
+        -0.054182715713977814,
+        1.478625774383545,
+        0.07809098809957504
+      ]
+    },
+    {
+      "name": "mp_112",
+      "mpIndex": 112,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8275,
+      "restPosition": [
+        -0.016475871205329895,
+        1.4848428964614868,
+        0.09231355041265488
+      ]
+    },
+    {
+      "name": "mp_113",
+      "mpIndex": 113,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8984,
+      "restPosition": [
+        -0.049945756793022156,
+        1.4953607320785522,
+        0.08226407319307327
+      ]
+    },
+    {
+      "name": "mp_114",
+      "mpIndex": 114,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9288,
+      "restPosition": [
+        -0.013409927487373352,
+        1.4755598306655884,
+        0.0980621948838234
+      ]
+    },
+    {
+      "name": "mp_115",
+      "mpIndex": 115,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19846,
+      "restPosition": [
+        -0.014410614967346191,
+        1.4557589292526245,
+        0.11119890958070755
+      ]
+    },
+    {
+      "name": "mp_116",
+      "mpIndex": 116,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18850,
+      "restPosition": [
+        -0.05927133560180664,
+        1.4754960536956787,
+        0.07274686545133591
+      ]
+    },
+    {
+      "name": "mp_117",
+      "mpIndex": 117,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19175,
+      "restPosition": [
+        -0.049668967723846436,
+        1.4729835987091064,
+        0.08490418642759323
+      ]
+    },
+    {
+      "name": "mp_118",
+      "mpIndex": 118,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19170,
+      "restPosition": [
+        -0.043388038873672485,
+        1.4712377786636353,
+        0.0893966481089592
+      ]
+    },
+    {
+      "name": "mp_119",
+      "mpIndex": 119,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12074,
+      "restPosition": [
+        -0.03218883275985718,
+        1.4720255136489868,
+        0.09269679337739944
+      ]
+    },
+    {
+      "name": "mp_120",
+      "mpIndex": 120,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11956,
+      "restPosition": [
+        -0.023012295365333557,
+        1.4738779067993164,
+        0.0937400683760643
+      ]
+    },
+    {
+      "name": "mp_121",
+      "mpIndex": 121,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11880,
+      "restPosition": [
+        -0.01698686182498932,
+        1.476794719696045,
+        0.094868503510952
+      ]
+    },
+    {
+      "name": "mp_122",
+      "mpIndex": 122,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7986,
+      "restPosition": [
+        -0.005745068192481995,
+        1.482458233833313,
+        0.10185203701257706
+      ]
+    },
+    {
+      "name": "mp_123",
+      "mpIndex": 123,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18826,
+      "restPosition": [
+        -0.05761061608791351,
+        1.4598681926727295,
+        0.07655801624059677
+      ]
+    },
+    {
+      "name": "mp_124",
+      "mpIndex": 124,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8931,
+      "restPosition": [
+        -0.054416924715042114,
+        1.4968724250793457,
+        0.07600443810224533
+      ]
+    },
+    {
+      "name": "mp_125",
+      "mpIndex": 125,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19689,
+      "restPosition": [
+        -0.0029133260250091553,
+        1.4488606452941895,
+        0.11390290409326553
+      ]
+    },
+    {
+      "name": "mp_126",
+      "mpIndex": 126,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11916,
+      "restPosition": [
+        -0.01596488058567047,
+        1.4656381607055664,
+        0.09985066205263138
+      ]
+    },
+    {
+      "name": "mp_127",
+      "mpIndex": 127,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 23302,
+      "restPosition": [
+        -0.06970405578613281,
+        1.4911237955093384,
+        0.013216465711593628
+      ]
+    },
+    {
+      "name": "mp_128",
+      "mpIndex": 128,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9232,
+      "restPosition": [
+        -0.013324767351150513,
+        1.4794561862945557,
+        0.09586919099092484
+      ]
+    },
+    {
+      "name": "mp_129",
+      "mpIndex": 129,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15933,
+      "restPosition": [
+        -0.01977601647377014,
+        1.4533956050872803,
+        0.0971466675400734
+      ]
+    },
+    {
+      "name": "mp_130",
+      "mpIndex": 130,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9092,
+      "restPosition": [
+        -0.04592170566320419,
+        1.4903786182403564,
+        0.0837118849158287
+      ]
+    },
+    {
+      "name": "mp_131",
+      "mpIndex": 131,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19470,
+      "restPosition": [
+        -0.015390023589134216,
+        1.459101676940918,
+        0.10679162293672562
+      ]
+    },
+    {
+      "name": "mp_132",
+      "mpIndex": 132,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6339,
+      "restPosition": [
+        -0.06176241487264633,
+        1.446433424949646,
+        0.047836072742938995
+      ]
+    },
+    {
+      "name": "mp_133",
+      "mpIndex": 133,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8257,
+      "restPosition": [
+        -0.01607133448123932,
+        1.487035870552063,
+        0.09178126603364944
+      ]
+    },
+    {
+      "name": "mp_134",
+      "mpIndex": 134,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16096,
+      "restPosition": [
+        -0.010088488459587097,
+        1.4628276824951172,
+        0.11136924475431442
+      ]
+    },
+    {
+      "name": "mp_135",
+      "mpIndex": 135,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5876,
+      "restPosition": [
+        -0.04472938925027847,
+        1.4134106636047363,
+        0.07146938890218735
+      ]
+    },
+    {
+      "name": "mp_136",
+      "mpIndex": 136,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5856,
+      "restPosition": [
+        -0.044644229114055634,
+        1.4068102836608887,
+        0.06433681398630142
+      ]
+    },
+    {
+      "name": "mp_137",
+      "mpIndex": 137,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6372,
+      "restPosition": [
+        -0.062358565628528595,
+        1.4607411623001099,
+        0.06465619057416916
+      ]
+    },
+    {
+      "name": "mp_138",
+      "mpIndex": 138,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6238,
+      "restPosition": [
+        -0.05139356106519699,
+        1.4225871562957764,
+        0.06412390619516373
+      ]
+    },
+    {
+      "name": "mp_139",
+      "mpIndex": 139,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18895,
+      "restPosition": [
+        -0.06361475586891174,
+        1.5008538961410522,
+        0.053116314113140106
+      ]
+    },
+    {
+      "name": "mp_140",
+      "mpIndex": 140,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22455,
+      "restPosition": [
+        -0.02160707116127014,
+        1.393183946609497,
+        0.09180255979299545
+      ]
+    },
+    {
+      "name": "mp_141",
+      "mpIndex": 141,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19708,
+      "restPosition": [
+        -0.0023384690284729004,
+        1.4471572637557983,
+        0.10898462682962418
+      ]
+    },
+    {
+      "name": "mp_142",
+      "mpIndex": 142,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12097,
+      "restPosition": [
+        -0.021756112575531006,
+        1.461827039718628,
+        0.09733829647302628
+      ]
+    },
+    {
+      "name": "mp_143",
+      "mpIndex": 143,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18870,
+      "restPosition": [
+        -0.05956941097974777,
+        1.486865520477295,
+        0.06731759756803513
+      ]
+    },
+    {
+      "name": "mp_144",
+      "mpIndex": 144,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24249,
+      "restPosition": [
+        -0.037085823714733124,
+        1.4862267971038818,
+        0.08709719032049179
+      ]
+    },
+    {
+      "name": "mp_145",
+      "mpIndex": 145,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24266,
+      "restPosition": [
+        -0.02991066873073578,
+        1.4854602813720703,
+        0.08892824500799179
+      ]
+    },
+    {
+      "name": "mp_146",
+      "mpIndex": 146,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18525,
+      "restPosition": [
+        -0.02271421253681183,
+        1.4204792976379395,
+        0.09840285032987595
+      ]
+    },
+    {
+      "name": "mp_147",
+      "mpIndex": 147,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15636,
+      "restPosition": [
+        -0.05516211688518524,
+        1.4477322101593018,
+        0.07415208965539932
+      ]
+    },
+    {
+      "name": "mp_148",
+      "mpIndex": 148,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15384,
+      "restPosition": [
+        -0.010173648595809937,
+        1.3861790895462036,
+        0.09597564488649368
+      ]
+    },
+    {
+      "name": "mp_149",
+      "mpIndex": 149,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22441,
+      "restPosition": [
+        -0.028186075389385223,
+        1.3935672044754028,
+        0.08245568722486496
+      ]
+    },
+    {
+      "name": "mp_150",
+      "mpIndex": 150,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5833,
+      "restPosition": [
+        -0.03610642999410629,
+        1.3996777534484863,
+        0.07470566779375076
+      ]
+    },
+    {
+      "name": "mp_151",
+      "mpIndex": 151,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9435,
+      "restPosition": [
+        -0.000017717480659484863,
+        1.5246788263320923,
+        0.10134104639291763
+      ]
+    },
+    {
+      "name": "mp_152",
+      "mpIndex": 152,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5531,
+      "restPosition": [
+        -0.000060304999351501465,
+        1.3855829238891602,
+        0.09767895191907883
+      ]
+    },
+    {
+      "name": "mp_153",
+      "mpIndex": 153,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8575,
+      "restPosition": [
+        -0.02639760822057724,
+        1.4862267971038818,
+        0.09242000430822372
+      ]
+    },
+    {
+      "name": "mp_154",
+      "mpIndex": 154,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8388,
+      "restPosition": [
+        -0.020925745368003845,
+        1.4866526126861572,
+        0.09137672930955887
+      ]
+    },
+    {
+      "name": "mp_155",
+      "mpIndex": 155,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8347,
+      "restPosition": [
+        -0.01754043996334076,
+        1.4869294166564941,
+        0.09065283089876175
+      ]
+    },
+    {
+      "name": "mp_156",
+      "mpIndex": 156,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18955,
+      "restPosition": [
+        -0.05844097584486008,
+        1.497851848602295,
+        0.06716855615377426
+      ]
+    },
+    {
+      "name": "mp_157",
+      "mpIndex": 157,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8153,
+      "restPosition": [
+        -0.02207547426223755,
+        1.492358684539795,
+        0.09273938089609146
+      ]
+    },
+    {
+      "name": "mp_158",
+      "mpIndex": 158,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8689,
+      "restPosition": [
+        -0.02703634649515152,
+        1.4947645664215088,
+        0.09446396678686142
+      ]
+    },
+    {
+      "name": "mp_159",
+      "mpIndex": 159,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8702,
+      "restPosition": [
+        -0.031720422208309174,
+        1.495445966720581,
+        0.09506013244390488
+      ]
+    },
+    {
+      "name": "mp_160",
+      "mpIndex": 160,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8709,
+      "restPosition": [
+        -0.03651095926761627,
+        1.4947433471679688,
+        0.09371877461671829
+      ]
+    },
+    {
+      "name": "mp_161",
+      "mpIndex": 161,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8718,
+      "restPosition": [
+        -0.04079050570726395,
+        1.4931038618087769,
+        0.09050378948450089
+      ]
+    },
+    {
+      "name": "mp_162",
+      "mpIndex": 162,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6991,
+      "restPosition": [
+        -0.0676175132393837,
+        1.505367636680603,
+        0.035401977598667145
+      ]
+    },
+    {
+      "name": "mp_163",
+      "mpIndex": 163,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24245,
+      "restPosition": [
+        -0.039555616676807404,
+        1.4874191284179688,
+        0.08522356301546097
+      ]
+    },
+    {
+      "name": "mp_164",
+      "mpIndex": 164,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20080,
+      "restPosition": [
+        -0.00010287761688232422,
+        1.4413660764694214,
+        0.10855879634618759
+      ]
+    },
+    {
+      "name": "mp_165",
+      "mpIndex": 165,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15768,
+      "restPosition": [
+        -0.01751914620399475,
+        1.4381085634231567,
+        0.10434312373399734
+      ]
+    },
+    {
+      "name": "mp_166",
+      "mpIndex": 166,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19870,
+      "restPosition": [
+        -0.013814464211463928,
+        1.4511600732803345,
+        0.109027199447155
+      ]
+    },
+    {
+      "name": "mp_167",
+      "mpIndex": 167,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20096,
+      "restPosition": [
+        -0.007533535361289978,
+        1.440748691558838,
+        0.10843104869127274
+      ]
+    },
+    {
+      "name": "mp_168",
+      "mpIndex": 168,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9380,
+      "restPosition": [
+        -0.000060304999351501465,
+        1.4914005994796753,
+        0.10068102926015854
+      ]
+    },
+    {
+      "name": "mp_169",
+      "mpIndex": 169,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22417,
+      "restPosition": [
+        -0.03691549599170685,
+        1.405958652496338,
+        0.07887875288724899
+      ]
+    },
+    {
+      "name": "mp_170",
+      "mpIndex": 170,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22463,
+      "restPosition": [
+        -0.029335804283618927,
+        1.399699091911316,
+        0.08554292470216751
+      ]
+    },
+    {
+      "name": "mp_171",
+      "mpIndex": 171,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15379,
+      "restPosition": [
+        -0.01153630018234253,
+        1.3903522491455078,
+        0.09938225895166397
+      ]
+    },
+    {
+      "name": "mp_172",
+      "mpIndex": 172,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5892,
+      "restPosition": [
+        -0.05145743489265442,
+        1.415624976158142,
+        0.055053822696208954
+      ]
+    },
+    {
+      "name": "mp_173",
+      "mpIndex": 173,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8136,
+      "restPosition": [
+        -0.017859801650047302,
+        1.4892927408218384,
+        0.09116382151842117
+      ]
+    },
+    {
+      "name": "mp_174",
+      "mpIndex": 174,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9299,
+      "restPosition": [
+        -0.00925813615322113,
+        1.4738140106201172,
+        0.10374697297811508
+      ]
+    },
+    {
+      "name": "mp_175",
+      "mpIndex": 175,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5535,
+      "restPosition": [
+        -0.000039011240005493164,
+        1.3896708488464355,
+        0.10144751518964767
+      ]
+    },
+    {
+      "name": "mp_176",
+      "mpIndex": 176,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22453,
+      "restPosition": [
+        -0.02071283757686615,
+        1.3911612033843994,
+        0.09154706448316574
+      ]
+    },
+    {
+      "name": "mp_177",
+      "mpIndex": 177,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6345,
+      "restPosition": [
+        -0.060357190668582916,
+        1.4470082521438599,
+        0.057310692965984344
+      ]
+    },
+    {
+      "name": "mp_178",
+      "mpIndex": 178,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17974,
+      "restPosition": [
+        -0.01089756190776825,
+        1.4244821071624756,
+        0.10764326900243759
+      ]
+    },
+    {
+      "name": "mp_179",
+      "mpIndex": 179,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5296,
+      "restPosition": [
+        -0.012409240007400513,
+        1.421416163444519,
+        0.10762197524309158
+      ]
+    },
+    {
+      "name": "mp_180",
+      "mpIndex": 180,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5342,
+      "restPosition": [
+        -0.01370801031589508,
+        1.4181585311889648,
+        0.10830330103635788
+      ]
+    },
+    {
+      "name": "mp_181",
+      "mpIndex": 181,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5355,
+      "restPosition": [
+        -0.014644816517829895,
+        1.414198398590088,
+        0.10708969086408615
+      ]
+    },
+    {
+      "name": "mp_182",
+      "mpIndex": 182,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5379,
+      "restPosition": [
+        -0.014474496245384216,
+        1.4107491970062256,
+        0.10342759639024734
+      ]
+    },
+    {
+      "name": "mp_183",
+      "mpIndex": 183,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18146,
+      "restPosition": [
+        -0.020031511783599854,
+        1.4248014688491821,
+        0.10272499173879623
+      ]
+    },
+    {
+      "name": "mp_184",
+      "mpIndex": 184,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18255,
+      "restPosition": [
+        -0.021458029747009277,
+        1.4251421689987183,
+        0.10197978466749191
+      ]
+    },
+    {
+      "name": "mp_185",
+      "mpIndex": 185,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18396,
+      "restPosition": [
+        -0.02235226333141327,
+        1.4259299039840698,
+        0.10185203701257706
+      ]
+    },
+    {
+      "name": "mp_186",
+      "mpIndex": 186,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15711,
+      "restPosition": [
+        -0.027824118733406067,
+        1.4303371906280518,
+        0.09914805740118027
+      ]
+    },
+    {
+      "name": "mp_187",
+      "mpIndex": 187,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15638,
+      "restPosition": [
+        -0.04830632358789444,
+        1.446156620979309,
+        0.08341380208730698
+      ]
+    },
+    {
+      "name": "mp_188",
+      "mpIndex": 188,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8007,
+      "restPosition": [
+        -0.008917465806007385,
+        1.4795200824737549,
+        0.10029778629541397
+      ]
+    },
+    {
+      "name": "mp_189",
+      "mpIndex": 189,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7879,
+      "restPosition": [
+        -0.011621460318565369,
+        1.492252230644226,
+        0.09369748085737228
+      ]
+    },
+    {
+      "name": "mp_190",
+      "mpIndex": 190,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7905,
+      "restPosition": [
+        -0.01590101420879364,
+        1.491613507270813,
+        0.09201546758413315
+      ]
+    },
+    {
+      "name": "mp_191",
+      "mpIndex": 191,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18119,
+      "restPosition": [
+        -0.018988236784934998,
+        1.4240349531173706,
+        0.10227786749601364
+      ]
+    },
+    {
+      "name": "mp_192",
+      "mpIndex": 192,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6266,
+      "restPosition": [
+        -0.04964767396450043,
+        1.432232141494751,
+        0.07413081079721451
+      ]
+    },
+    {
+      "name": "mp_193",
+      "mpIndex": 193,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7929,
+      "restPosition": [
+        -0.006681889295578003,
+        1.4907830953598022,
+        0.09759379178285599
+      ]
+    },
+    {
+      "name": "mp_194",
+      "mpIndex": 194,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5584,
+      "restPosition": [
+        -0.01824304461479187,
+        1.4056180715560913,
+        0.09748733788728714
+      ]
+    },
+    {
+      "name": "mp_195",
+      "mpIndex": 195,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12240,
+      "restPosition": [
+        -0.00010287761688232422,
+        1.4712164402008057,
+        0.11175248771905899
+      ]
+    },
+    {
+      "name": "mp_196",
+      "mpIndex": 196,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12204,
+      "restPosition": [
+        -0.004829540848731995,
+        1.4756450653076172,
+        0.10683419555425644
+      ]
+    },
+    {
+      "name": "mp_197",
+      "mpIndex": 197,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9348,
+      "restPosition": [
+        -0.00010287761688232422,
+        1.477603793144226,
+        0.10721743851900101
+      ]
+    },
+    {
+      "name": "mp_198",
+      "mpIndex": 198,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12158,
+      "restPosition": [
+        -0.013090565800666809,
+        1.4647012948989868,
+        0.1040024682879448
+      ]
+    },
+    {
+      "name": "mp_199",
+      "mpIndex": 199,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5507,
+      "restPosition": [
+        -0.000039011240005493164,
+        1.3943336009979248,
+        0.1035553440451622
+      ]
+    },
+    {
+      "name": "mp_200",
+      "mpIndex": 200,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5456,
+      "restPosition": [
+        -0.00008158385753631592,
+        1.4013384580612183,
+        0.10366179794073105
+      ]
+    },
+    {
+      "name": "mp_201",
+      "mpIndex": 201,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5566,
+      "restPosition": [
+        -0.00834260880947113,
+        1.4025946855545044,
+        0.1017242893576622
+      ]
+    },
+    {
+      "name": "mp_202",
+      "mpIndex": 202,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15305,
+      "restPosition": [
+        -0.031017810106277466,
+        1.4167746305465698,
+        0.09207934886217117
+      ]
+    },
+    {
+      "name": "mp_203",
+      "mpIndex": 203,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15806,
+      "restPosition": [
+        -0.025077544152736664,
+        1.4486689567565918,
+        0.09684859961271286
+      ]
+    },
+    {
+      "name": "mp_204",
+      "mpIndex": 204,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5632,
+      "restPosition": [
+        -0.02518400549888611,
+        1.4101104736328125,
+        0.09427235275506973
+      ]
+    },
+    {
+      "name": "mp_205",
+      "mpIndex": 205,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15798,
+      "restPosition": [
+        -0.03802264481782913,
+        1.4498612880706787,
+        0.0932716652750969
+      ]
+    },
+    {
+      "name": "mp_206",
+      "mpIndex": 206,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15780,
+      "restPosition": [
+        -0.028782226145267487,
+        1.4427074193954468,
+        0.09691246598958969
+      ]
+    },
+    {
+      "name": "mp_207",
+      "mpIndex": 207,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15621,
+      "restPosition": [
+        -0.041131168603897095,
+        1.4394285678863525,
+        0.08907728642225266
+      ]
+    },
+    {
+      "name": "mp_208",
+      "mpIndex": 208,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5714,
+      "restPosition": [
+        -0.010407865047454834,
+        1.3949511051177979,
+        0.10178817063570023
+      ]
+    },
+    {
+      "name": "mp_209",
+      "mpIndex": 209,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12118,
+      "restPosition": [
+        -0.016816526651382446,
+        1.4609966278076172,
+        0.09961646050214767
+      ]
+    },
+    {
+      "name": "mp_210",
+      "mpIndex": 210,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15491,
+      "restPosition": [
+        -0.03538252413272858,
+        1.4122822284698486,
+        0.08535131067037582
+      ]
+    },
+    {
+      "name": "mp_211",
+      "mpIndex": 211,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15350,
+      "restPosition": [
+        -0.028186075389385223,
+        1.404915452003479,
+        0.08901340514421463
+      ]
+    },
+    {
+      "name": "mp_212",
+      "mpIndex": 212,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15511,
+      "restPosition": [
+        -0.03555285185575485,
+        1.423417568206787,
+        0.09073800593614578
+      ]
+    },
+    {
+      "name": "mp_213",
+      "mpIndex": 213,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6296,
+      "restPosition": [
+        -0.0536930188536644,
+        1.4383214712142944,
+        0.07055387645959854
+      ]
+    },
+    {
+      "name": "mp_214",
+      "mpIndex": 214,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6254,
+      "restPosition": [
+        -0.04268542677164078,
+        1.4245460033416748,
+        0.08196599036455154
+      ]
+    },
+    {
+      "name": "mp_215",
+      "mpIndex": 215,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6307,
+      "restPosition": [
+        -0.05775965005159378,
+        1.4345741271972656,
+        0.056650660932064056
+      ]
+    },
+    {
+      "name": "mp_216",
+      "mpIndex": 216,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 15676,
+      "restPosition": [
+        -0.033253394067287445,
+        1.4350212812423706,
+        0.09499625116586685
+      ]
+    },
+    {
+      "name": "mp_217",
+      "mpIndex": 217,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9313,
+      "restPosition": [
+        -0.012324079871177673,
+        1.4696621894836426,
+        0.1024056151509285
+      ]
+    },
+    {
+      "name": "mp_218",
+      "mpIndex": 218,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19853,
+      "restPosition": [
+        -0.012707322835922241,
+        1.4536511898040771,
+        0.11230606585741043
+      ]
+    },
+    {
+      "name": "mp_219",
+      "mpIndex": 219,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16024,
+      "restPosition": [
+        -0.016390711069107056,
+        1.4515007734298706,
+        0.10838846117258072
+      ]
+    },
+    {
+      "name": "mp_220",
+      "mpIndex": 220,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19805,
+      "restPosition": [
+        -0.010663360357284546,
+        1.4566106796264648,
+        0.11420098692178726
+      ]
+    },
+    {
+      "name": "mp_221",
+      "mpIndex": 221,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7851,
+      "restPosition": [
+        -0.016773954033851624,
+        1.498043417930603,
+        0.09454914182424545
+      ]
+    },
+    {
+      "name": "mp_222",
+      "mpIndex": 222,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3164,
+      "restPosition": [
+        -0.027462169528007507,
+        1.5031533241271973,
+        0.09535820037126541
+      ]
+    },
+    {
+      "name": "mp_223",
+      "mpIndex": 223,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3153,
+      "restPosition": [
+        -0.035488978028297424,
+        1.5044095516204834,
+        0.09414460510015488
+      ]
+    },
+    {
+      "name": "mp_224",
+      "mpIndex": 224,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 3227,
+      "restPosition": [
+        -0.042813174426555634,
+        1.5028126239776611,
+        0.09092961996793747
+      ]
+    },
+    {
+      "name": "mp_225",
+      "mpIndex": 225,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8817,
+      "restPosition": [
+        -0.0482211634516716,
+        1.5000873804092407,
+        0.08630941063165665
+      ]
+    },
+    {
+      "name": "mp_226",
+      "mpIndex": 226,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9066,
+      "restPosition": [
+        -0.04992446303367615,
+        1.4894843101501465,
+        0.07932587713003159
+      ]
+    },
+    {
+      "name": "mp_227",
+      "mpIndex": 227,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6905,
+      "restPosition": [
+        -0.064658023416996,
+        1.4752192497253418,
+        0.060334064066410065
+      ]
+    },
+    {
+      "name": "mp_228",
+      "mpIndex": 228,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19453,
+      "restPosition": [
+        -0.04453776776790619,
+        1.479434847831726,
+        0.08607520908117294
+      ]
+    },
+    {
+      "name": "mp_229",
+      "mpIndex": 229,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19412,
+      "restPosition": [
+        -0.03878913074731827,
+        1.4770289659500122,
+        0.0898650512099266
+      ]
+    },
+    {
+      "name": "mp_230",
+      "mpIndex": 230,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12055,
+      "restPosition": [
+        -0.031975917518138885,
+        1.4774973392486572,
+        0.09197289496660233
+      ]
+    },
+    {
+      "name": "mp_231",
+      "mpIndex": 231,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11865,
+      "restPosition": [
+        -0.0244813933968544,
+        1.478668451309204,
+        0.09284583479166031
+      ]
+    },
+    {
+      "name": "mp_232",
+      "mpIndex": 232,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9224,
+      "restPosition": [
+        -0.01845596730709076,
+        1.4806485176086426,
+        0.09267549961805344
+      ]
+    },
+    {
+      "name": "mp_233",
+      "mpIndex": 233,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8020,
+      "restPosition": [
+        -0.014687404036521912,
+        1.4816491603851318,
+        0.09354843944311142
+      ]
+    },
+    {
+      "name": "mp_234",
+      "mpIndex": 234,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 6903,
+      "restPosition": [
+        -0.06546709686517715,
+        1.475112795829773,
+        0.057566188275814056
+      ]
+    },
+    {
+      "name": "mp_235",
+      "mpIndex": 235,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16038,
+      "restPosition": [
+        -0.015666797757148743,
+        1.4500741958618164,
+        0.10726002603769302
+      ]
+    },
+    {
+      "name": "mp_236",
+      "mpIndex": 236,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12175,
+      "restPosition": [
+        -0.00970524549484253,
+        1.467320203781128,
+        0.10813296586275101
+      ]
+    },
+    {
+      "name": "mp_237",
+      "mpIndex": 237,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19791,
+      "restPosition": [
+        -0.008725851774215698,
+        1.4528207778930664,
+        0.11420098692178726
+      ]
+    },
+    {
+      "name": "mp_238",
+      "mpIndex": 238,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20013,
+      "restPosition": [
+        -0.006362512707710266,
+        1.4497548341751099,
+        0.10466248542070389
+      ]
+    },
+    {
+      "name": "mp_239",
+      "mpIndex": 239,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19790,
+      "restPosition": [
+        -0.008385181427001953,
+        1.4518840312957764,
+        0.11324287205934525
+      ]
+    },
+    {
+      "name": "mp_240",
+      "mpIndex": 240,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19892,
+      "restPosition": [
+        -0.01406995952129364,
+        1.4480090141296387,
+        0.10361922532320023
+      ]
+    },
+    {
+      "name": "mp_241",
+      "mpIndex": 241,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20027,
+      "restPosition": [
+        -0.005361825227737427,
+        1.4492225646972656,
+        0.10572705417871475
+      ]
+    },
+    {
+      "name": "mp_242",
+      "mpIndex": 242,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19758,
+      "restPosition": [
+        -0.003956601023674011,
+        1.4481792449951172,
+        0.1069832369685173
+      ]
+    },
+    {
+      "name": "mp_243",
+      "mpIndex": 243,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8034,
+      "restPosition": [
+        -0.01406995952129364,
+        1.4866951704025269,
+        0.09248388558626175
+      ]
+    },
+    {
+      "name": "mp_244",
+      "mpIndex": 244,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7961,
+      "restPosition": [
+        -0.01096142828464508,
+        1.4853326082229614,
+        0.0946555957198143
+      ]
+    },
+    {
+      "name": "mp_245",
+      "mpIndex": 245,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 7987,
+      "restPosition": [
+        -0.009683951735496521,
+        1.4840977191925049,
+        0.09646535664796829
+      ]
+    },
+    {
+      "name": "mp_246",
+      "mpIndex": 246,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9178,
+      "restPosition": [
+        -0.04232347756624222,
+        1.491783857345581,
+        0.08765076845884323
+      ]
+    },
+    {
+      "name": "mp_247",
+      "mpIndex": 247,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8807,
+      "restPosition": [
+        -0.046496570110321045,
+        1.4951691627502441,
+        0.0855216309428215
+      ]
+    },
+    {
+      "name": "mp_248",
+      "mpIndex": 248,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16127,
+      "restPosition": [
+        0.00485798716545105,
+        1.4707906246185303,
+        0.11028338223695755
+      ]
+    },
+    {
+      "name": "mp_249",
+      "mpIndex": 249,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11679,
+      "restPosition": [
+        0.0415002703666687,
+        1.488398551940918,
+        0.08665008097887039
+      ]
+    },
+    {
+      "name": "mp_250",
+      "mpIndex": 250,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17684,
+      "restPosition": [
+        0.004921853542327881,
+        1.448456048965454,
+        0.10596125572919846
+      ]
+    },
+    {
+      "name": "mp_251",
+      "mpIndex": 251,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11164,
+      "restPosition": [
+        0.06351545453071594,
+        1.51663076877594,
+        0.05181754380464554
+      ]
+    },
+    {
+      "name": "mp_252",
+      "mpIndex": 252,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13038,
+      "restPosition": [
+        0.02542535960674286,
+        1.4821388721466064,
+        0.09346327930688858
+      ]
+    },
+    {
+      "name": "mp_253",
+      "mpIndex": 253,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13043,
+      "restPosition": [
+        0.03140820562839508,
+        1.4818195104599,
+        0.09344198554754257
+      ]
+    },
+    {
+      "name": "mp_254",
+      "mpIndex": 254,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13052,
+      "restPosition": [
+        0.036092281341552734,
+        1.482458233833313,
+        0.09224968403577805
+      ]
+    },
+    {
+      "name": "mp_255",
+      "mpIndex": 255,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11798,
+      "restPosition": [
+        0.0433313250541687,
+        1.4860777854919434,
+        0.08722493797540665
+      ]
+    },
+    {
+      "name": "mp_256",
+      "mpIndex": 256,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12938,
+      "restPosition": [
+        0.019825756549835205,
+        1.4837356805801392,
+        0.09256904572248459
+      ]
+    },
+    {
+      "name": "mp_257",
+      "mpIndex": 257,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11301,
+      "restPosition": [
+        0.034388989210128784,
+        1.5013649463653564,
+        0.09386781603097916
+      ]
+    },
+    {
+      "name": "mp_258",
+      "mpIndex": 258,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11379,
+      "restPosition": [
+        0.027000904083251953,
+        1.500342845916748,
+        0.09429364651441574
+      ]
+    },
+    {
+      "name": "mp_259",
+      "mpIndex": 259,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11288,
+      "restPosition": [
+        0.04030795395374298,
+        1.5011732578277588,
+        0.09195160120725632
+      ]
+    },
+    {
+      "name": "mp_260",
+      "mpIndex": 260,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11019,
+      "restPosition": [
+        0.04424683749675751,
+        1.4982776641845703,
+        0.0889495387673378
+      ]
+    },
+    {
+      "name": "mp_261",
+      "mpIndex": 261,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13084,
+      "restPosition": [
+        0.0481218546628952,
+        1.4825221300125122,
+        0.0823279395699501
+      ]
+    },
+    {
+      "name": "mp_262",
+      "mpIndex": 262,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4439,
+      "restPosition": [
+        0.021997466683387756,
+        1.4008487462997437,
+        0.093058742582798
+      ]
+    },
+    {
+      "name": "mp_263",
+      "mpIndex": 263,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11646,
+      "restPosition": [
+        0.043097108602523804,
+        1.4907618761062622,
+        0.08622425049543381
+      ]
+    },
+    {
+      "name": "mp_264",
+      "mpIndex": 264,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10469,
+      "restPosition": [
+        0.06481420993804932,
+        1.4880365133285522,
+        0.054691873490810394
+      ]
+    },
+    {
+      "name": "mp_265",
+      "mpIndex": 265,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10642,
+      "restPosition": [
+        0.05495636165142059,
+        1.4876532554626465,
+        0.07400306314229965
+      ]
+    },
+    {
+      "name": "mp_266",
+      "mpIndex": 266,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16457,
+      "restPosition": [
+        0.0289384126663208,
+        1.4573132991790771,
+        0.09627372771501541
+      ]
+    },
+    {
+      "name": "mp_267",
+      "mpIndex": 267,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17110,
+      "restPosition": [
+        0.0067316144704818726,
+        1.4338502883911133,
+        0.11305125802755356
+      ]
+    },
+    {
+      "name": "mp_268",
+      "mpIndex": 268,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17000,
+      "restPosition": [
+        0.007093563675880432,
+        1.4266325235366821,
+        0.11128408461809158
+      ]
+    },
+    {
+      "name": "mp_269",
+      "mpIndex": 269,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17145,
+      "restPosition": [
+        0.01458810269832611,
+        1.431614637374878,
+        0.10951689630746841
+      ]
+    },
+    {
+      "name": "mp_270",
+      "mpIndex": 270,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16579,
+      "restPosition": [
+        0.019570261240005493,
+        1.4283145666122437,
+        0.1053863987326622
+      ]
+    },
+    {
+      "name": "mp_271",
+      "mpIndex": 271,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16982,
+      "restPosition": [
+        0.012522846460342407,
+        1.4256317615509033,
+        0.10826071351766586
+      ]
+    },
+    {
+      "name": "mp_272",
+      "mpIndex": 272,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18732,
+      "restPosition": [
+        0.01748371124267578,
+        1.425546646118164,
+        0.10498186200857162
+      ]
+    },
+    {
+      "name": "mp_273",
+      "mpIndex": 273,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4598,
+      "restPosition": [
+        0.026638954877853394,
+        1.4183076620101929,
+        0.09516658633947372
+      ]
+    },
+    {
+      "name": "mp_274",
+      "mpIndex": 274,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19567,
+      "restPosition": [
+        0.003686964511871338,
+        1.4521394968032837,
+        0.1172456368803978
+      ]
+    },
+    {
+      "name": "mp_275",
+      "mpIndex": 275,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17576,
+      "restPosition": [
+        0.005262523889541626,
+        1.4570364952087402,
+        0.1181611642241478
+      ]
+    },
+    {
+      "name": "mp_276",
+      "mpIndex": 276,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11266,
+      "restPosition": [
+        0.05231623351573944,
+        1.503089427947998,
+        0.08226407319307327
+      ]
+    },
+    {
+      "name": "mp_277",
+      "mpIndex": 277,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13513,
+      "restPosition": [
+        0.016632065176963806,
+        1.4721319675445557,
+        0.09701891988515854
+      ]
+    },
+    {
+      "name": "mp_278",
+      "mpIndex": 278,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17343,
+      "restPosition": [
+        0.017057880759239197,
+        1.4531188011169434,
+        0.10809039324522018
+      ]
+    },
+    {
+      "name": "mp_279",
+      "mpIndex": 279,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16395,
+      "restPosition": [
+        0.01786695420742035,
+        1.456227421760559,
+        0.10557801276445389
+      ]
+    },
+    {
+      "name": "mp_280",
+      "mpIndex": 280,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13455,
+      "restPosition": [
+        0.04535399377346039,
+        1.4587184190750122,
+        0.08982247859239578
+      ]
+    },
+    {
+      "name": "mp_281",
+      "mpIndex": 281,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16233,
+      "restPosition": [
+        0.005219936370849609,
+        1.464296817779541,
+        0.11537200957536697
+      ]
+    },
+    {
+      "name": "mp_282",
+      "mpIndex": 282,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11351,
+      "restPosition": [
+        0.03962664306163788,
+        1.5092213153839111,
+        0.09363361448049545
+      ]
+    },
+    {
+      "name": "mp_283",
+      "mpIndex": 283,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11348,
+      "restPosition": [
+        0.04656758904457092,
+        1.507007122039795,
+        0.08884306997060776
+      ]
+    },
+    {
+      "name": "mp_284",
+      "mpIndex": 284,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11215,
+      "restPosition": [
+        0.057383567094802856,
+        1.524423360824585,
+        0.06569946557283401
+      ]
+    },
+    {
+      "name": "mp_285",
+      "mpIndex": 285,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22018,
+      "restPosition": [
+        0.011628612875938416,
+        1.5023016929626465,
+        0.10006356984376907
+      ]
+    },
+    {
+      "name": "mp_286",
+      "mpIndex": 286,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11514,
+      "restPosition": [
+        0.02012382447719574,
+        1.4967020750045776,
+        0.09342069178819656
+      ]
+    },
+    {
+      "name": "mp_287",
+      "mpIndex": 287,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14404,
+      "restPosition": [
+        0.030322343111038208,
+        1.4250357151031494,
+        0.09559240192174911
+      ]
+    },
+    {
+      "name": "mp_288",
+      "mpIndex": 288,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14125,
+      "restPosition": [
+        0.05797971785068512,
+        1.429017186164856,
+        0.05137043446302414
+      ]
+    },
+    {
+      "name": "mp_289",
+      "mpIndex": 289,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17372,
+      "restPosition": [
+        0.013161584734916687,
+        1.4498400688171387,
+        0.10421537607908249
+      ]
+    },
+    {
+      "name": "mp_290",
+      "mpIndex": 290,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17480,
+      "restPosition": [
+        0.008839458227157593,
+        1.448456048965454,
+        0.1037682518362999
+      ]
+    },
+    {
+      "name": "mp_291",
+      "mpIndex": 291,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14452,
+      "restPosition": [
+        0.026085391640663147,
+        1.4229917526245117,
+        0.09697634726762772
+      ]
+    },
+    {
+      "name": "mp_292",
+      "mpIndex": 292,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16629,
+      "restPosition": [
+        0.024275630712509155,
+        1.4233323335647583,
+        0.09746604412794113
+      ]
+    },
+    {
+      "name": "mp_293",
+      "mpIndex": 293,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22141,
+      "restPosition": [
+        0.050463899970054626,
+        1.5123937129974365,
+        0.08183824270963669
+      ]
+    },
+    {
+      "name": "mp_294",
+      "mpIndex": 294,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17333,
+      "restPosition": [
+        0.017292097210884094,
+        1.4503509998321533,
+        0.10602513700723648
+      ]
+    },
+    {
+      "name": "mp_295",
+      "mpIndex": 295,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11371,
+      "restPosition": [
+        0.026851877570152283,
+        1.5070922374725342,
+        0.0980621948838234
+      ]
+    },
+    {
+      "name": "mp_296",
+      "mpIndex": 296,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11481,
+      "restPosition": [
+        0.028278380632400513,
+        1.5128834247589111,
+        0.0992119237780571
+      ]
+    },
+    {
+      "name": "mp_297",
+      "mpIndex": 297,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9960,
+      "restPosition": [
+        0.032919883728027344,
+        1.5350902080535889,
+        0.09065283089876175
+      ]
+    },
+    {
+      "name": "mp_298",
+      "mpIndex": 298,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22206,
+      "restPosition": [
+        0.0531466007232666,
+        1.5188876390457153,
+        0.07493986934423447
+      ]
+    },
+    {
+      "name": "mp_299",
+      "mpIndex": 299,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22062,
+      "restPosition": [
+        0.03042881190776825,
+        1.5254453420639038,
+        0.09471946209669113
+      ]
+    },
+    {
+      "name": "mp_300",
+      "mpIndex": 300,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11122,
+      "restPosition": [
+        0.05582930147647858,
+        1.50655996799469,
+        0.07321528345346451
+      ]
+    },
+    {
+      "name": "mp_301",
+      "mpIndex": 301,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11135,
+      "restPosition": [
+        0.05942752957344055,
+        1.5109460353851318,
+        0.06418777257204056
+      ]
+    },
+    {
+      "name": "mp_302",
+      "mpIndex": 302,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17098,
+      "restPosition": [
+        0.007689729332923889,
+        1.4305075407028198,
+        0.11247638612985611
+      ]
+    },
+    {
+      "name": "mp_303",
+      "mpIndex": 303,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18715,
+      "restPosition": [
+        0.013651281595230103,
+        1.4284849166870117,
+        0.10936786979436874
+      ]
+    },
+    {
+      "name": "mp_304",
+      "mpIndex": 304,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16597,
+      "restPosition": [
+        0.018441826105117798,
+        1.4266538619995117,
+        0.10540769249200821
+      ]
+    },
+    {
+      "name": "mp_305",
+      "mpIndex": 305,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17378,
+      "restPosition": [
+        0.01150086522102356,
+        1.449009656906128,
+        0.1030869409441948
+      ]
+    },
+    {
+      "name": "mp_306",
+      "mpIndex": 306,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14454,
+      "restPosition": [
+        0.02546793222427368,
+        1.423524022102356,
+        0.09750861674547195
+      ]
+    },
+    {
+      "name": "mp_307",
+      "mpIndex": 307,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16646,
+      "restPosition": [
+        0.022551029920578003,
+        1.4217568635940552,
+        0.09748733788728714
+      ]
+    },
+    {
+      "name": "mp_308",
+      "mpIndex": 308,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16623,
+      "restPosition": [
+        0.023615598678588867,
+        1.4236516952514648,
+        0.09795574098825455
+      ]
+    },
+    {
+      "name": "mp_309",
+      "mpIndex": 309,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17529,
+      "restPosition": [
+        0.010351136326789856,
+        1.4522671699523926,
+        0.11213573068380356
+      ]
+    },
+    {
+      "name": "mp_310",
+      "mpIndex": 310,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16969,
+      "restPosition": [
+        0.0159294456243515,
+        1.423992395401001,
+        0.10389599949121475
+      ]
+    },
+    {
+      "name": "mp_311",
+      "mpIndex": 311,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16978,
+      "restPosition": [
+        0.010670498013496399,
+        1.424333095550537,
+        0.10762197524309158
+      ]
+    },
+    {
+      "name": "mp_312",
+      "mpIndex": 312,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16926,
+      "restPosition": [
+        0.006518706679344177,
+        1.4246524572372437,
+        0.10966593772172928
+      ]
+    },
+    {
+      "name": "mp_313",
+      "mpIndex": 313,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5189,
+      "restPosition": [
+        0.00875428318977356,
+        1.4077684879302979,
+        0.10246949642896652
+      ]
+    },
+    {
+      "name": "mp_314",
+      "mpIndex": 314,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5201,
+      "restPosition": [
+        0.007838770747184753,
+        1.4124099016189575,
+        0.11000660806894302
+      ]
+    },
+    {
+      "name": "mp_315",
+      "mpIndex": 315,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5127,
+      "restPosition": [
+        0.007221311330795288,
+        1.4169024229049683,
+        0.11143311113119125
+      ]
+    },
+    {
+      "name": "mp_316",
+      "mpIndex": 316,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5054,
+      "restPosition": [
+        0.007668435573577881,
+        1.4208838939666748,
+        0.11000660806894302
+      ]
+    },
+    {
+      "name": "mp_317",
+      "mpIndex": 317,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16926,
+      "restPosition": [
+        0.006518706679344177,
+        1.4246524572372437,
+        0.10966593772172928
+      ]
+    },
+    {
+      "name": "mp_318",
+      "mpIndex": 318,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16969,
+      "restPosition": [
+        0.0159294456243515,
+        1.423992395401001,
+        0.10389599949121475
+      ]
+    },
+    {
+      "name": "mp_319",
+      "mpIndex": 319,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14514,
+      "restPosition": [
+        0.017803087830543518,
+        1.4223955869674683,
+        0.1012771800160408
+      ]
+    },
+    {
+      "name": "mp_320",
+      "mpIndex": 320,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14506,
+      "restPosition": [
+        0.019463807344436646,
+        1.420032262802124,
+        0.10131976753473282
+      ]
+    },
+    {
+      "name": "mp_321",
+      "mpIndex": 321,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14485,
+      "restPosition": [
+        0.020421907305717468,
+        1.4173921346664429,
+        0.10119201987981796
+      ]
+    },
+    {
+      "name": "mp_322",
+      "mpIndex": 322,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16523,
+      "restPosition": [
+        0.023722052574157715,
+        1.434701919555664,
+        0.10140492767095566
+      ]
+    },
+    {
+      "name": "mp_323",
+      "mpIndex": 323,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10443,
+      "restPosition": [
+        0.06402644515037537,
+        1.4626147747039795,
+        0.060696013271808624
+      ]
+    },
+    {
+      "name": "mp_324",
+      "mpIndex": 324,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18747,
+      "restPosition": [
+        0.019548967480659485,
+        1.4237369298934937,
+        0.10051069408655167
+      ]
+    },
+    {
+      "name": "mp_325",
+      "mpIndex": 325,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16681,
+      "restPosition": [
+        0.020826444029808044,
+        1.422800064086914,
+        0.09691246598958969
+      ]
+    },
+    {
+      "name": "mp_326",
+      "mpIndex": 326,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17475,
+      "restPosition": [
+        0.0067316144704818726,
+        1.4460288286209106,
+        0.10568446666002274
+      ]
+    },
+    {
+      "name": "mp_327",
+      "mpIndex": 327,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17314,
+      "restPosition": [
+        0.01550363004207611,
+        1.4465610980987549,
+        0.1001487448811531
+      ]
+    },
+    {
+      "name": "mp_328",
+      "mpIndex": 328,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17474,
+      "restPosition": [
+        0.007860049605369568,
+        1.4473276138305664,
+        0.10464120656251907
+      ]
+    },
+    {
+      "name": "mp_329",
+      "mpIndex": 329,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13499,
+      "restPosition": [
+        0.023466557264328003,
+        1.4689595699310303,
+        0.09482591599225998
+      ]
+    },
+    {
+      "name": "mp_330",
+      "mpIndex": 330,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13486,
+      "restPosition": [
+        0.032259851694107056,
+        1.4643819332122803,
+        0.093974269926548
+      ]
+    },
+    {
+      "name": "mp_331",
+      "mpIndex": 331,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17338,
+      "restPosition": [
+        0.01869732141494751,
+        1.453949213027954,
+        0.10489670187234879
+      ]
+    },
+    {
+      "name": "mp_332",
+      "mpIndex": 332,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22183,
+      "restPosition": [
+        0.04795151948928833,
+        1.5320030450820923,
+        0.07715416699647903
+      ]
+    },
+    {
+      "name": "mp_333",
+      "mpIndex": 333,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22113,
+      "restPosition": [
+        0.04409781098365784,
+        1.5224006175994873,
+        0.08533001691102982
+      ]
+    },
+    {
+      "name": "mp_334",
+      "mpIndex": 334,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22117,
+      "restPosition": [
+        0.04096798598766327,
+        1.514650583267212,
+        0.0916748121380806
+      ]
+    },
+    {
+      "name": "mp_335",
+      "mpIndex": 335,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4647,
+      "restPosition": [
+        0.021805837750434875,
+        1.4144752025604248,
+        0.09887126833200455
+      ]
+    },
+    {
+      "name": "mp_336",
+      "mpIndex": 336,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 22033,
+      "restPosition": [
+        0.014502927660942078,
+        1.5108182430267334,
+        0.10289531201124191
+      ]
+    },
+    {
+      "name": "mp_337",
+      "mpIndex": 337,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9507,
+      "restPosition": [
+        0.01522684097290039,
+        1.5250407457351685,
+        0.09995711594820023
+      ]
+    },
+    {
+      "name": "mp_338",
+      "mpIndex": 338,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 9516,
+      "restPosition": [
+        0.016759812831878662,
+        1.5366020202636719,
+        0.09686987847089767
+      ]
+    },
+    {
+      "name": "mp_339",
+      "mpIndex": 339,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13064,
+      "restPosition": [
+        0.040456995368003845,
+        1.4832886457443237,
+        0.0898650512099266
+      ]
+    },
+    {
+      "name": "mp_340",
+      "mpIndex": 340,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10602,
+      "restPosition": [
+        0.054317623376846313,
+        1.4785406589508057,
+        0.07847423106431961
+      ]
+    },
+    {
+      "name": "mp_341",
+      "mpIndex": 341,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12947,
+      "restPosition": [
+        0.01629139482975006,
+        1.4846937656402588,
+        0.09231355041265488
+      ]
+    },
+    {
+      "name": "mp_342",
+      "mpIndex": 342,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11035,
+      "restPosition": [
+        0.05014452338218689,
+        1.495296835899353,
+        0.08234923332929611
+      ]
+    },
+    {
+      "name": "mp_343",
+      "mpIndex": 343,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13521,
+      "restPosition": [
+        0.013204172253608704,
+        1.4755386114120483,
+        0.09801960736513138
+      ]
+    },
+    {
+      "name": "mp_344",
+      "mpIndex": 344,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17589,
+      "restPosition": [
+        0.014162272214889526,
+        1.4550350904464722,
+        0.11134795099496841
+      ]
+    },
+    {
+      "name": "mp_345",
+      "mpIndex": 345,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13416,
+      "restPosition": [
+        0.059448808431625366,
+        1.4755172729492188,
+        0.0731939896941185
+      ]
+    },
+    {
+      "name": "mp_346",
+      "mpIndex": 346,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13315,
+      "restPosition": [
+        0.04969741404056549,
+        1.4727920293807983,
+        0.0852874293923378
+      ]
+    },
+    {
+      "name": "mp_347",
+      "mpIndex": 347,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13316,
+      "restPosition": [
+        0.043288737535476685,
+        1.4710886478424072,
+        0.0896308496594429
+      ]
+    },
+    {
+      "name": "mp_348",
+      "mpIndex": 348,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13327,
+      "restPosition": [
+        0.03206823766231537,
+        1.4718977212905884,
+        0.0928245410323143
+      ]
+    },
+    {
+      "name": "mp_349",
+      "mpIndex": 349,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13336,
+      "restPosition": [
+        0.0241478830575943,
+        1.4740269184112549,
+        0.09335682541131973
+      ]
+    },
+    {
+      "name": "mp_350",
+      "mpIndex": 350,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13189,
+      "restPosition": [
+        0.01667463779449463,
+        1.476688265800476,
+        0.09480463713407516
+      ]
+    },
+    {
+      "name": "mp_351",
+      "mpIndex": 351,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12310,
+      "restPosition": [
+        0.005539312958717346,
+        1.482458233833313,
+        0.10180946439504623
+      ]
+    },
+    {
+      "name": "mp_352",
+      "mpIndex": 352,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13608,
+      "restPosition": [
+        0.05761776864528656,
+        1.4598468542099,
+        0.07691996544599533
+      ]
+    },
+    {
+      "name": "mp_353",
+      "mpIndex": 353,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11057,
+      "restPosition": [
+        0.05459439754486084,
+        1.496638298034668,
+        0.07628122717142105
+      ]
+    },
+    {
+      "name": "mp_354",
+      "mpIndex": 354,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19650,
+      "restPosition": [
+        0.0018133372068405151,
+        1.4487754106521606,
+        0.11426485329866409
+      ]
+    },
+    {
+      "name": "mp_355",
+      "mpIndex": 355,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16197,
+      "restPosition": [
+        0.01565265655517578,
+        1.4657232761383057,
+        0.09978679567575455
+      ]
+    },
+    {
+      "name": "mp_356",
+      "mpIndex": 356,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 21774,
+      "restPosition": [
+        0.06922151148319244,
+        1.4909747838974,
+        0.013216465711593628
+      ]
+    },
+    {
+      "name": "mp_357",
+      "mpIndex": 357,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12351,
+      "restPosition": [
+        0.013033837080001831,
+        1.4793709516525269,
+        0.095784030854702
+      ]
+    },
+    {
+      "name": "mp_358",
+      "mpIndex": 358,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17276,
+      "restPosition": [
+        0.019357338547706604,
+        1.4535659551620483,
+        0.09697634726762772
+      ]
+    },
+    {
+      "name": "mp_359",
+      "mpIndex": 359,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10764,
+      "restPosition": [
+        0.046397268772125244,
+        1.4906340837478638,
+        0.0839247927069664
+      ]
+    },
+    {
+      "name": "mp_360",
+      "mpIndex": 360,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16383,
+      "restPosition": [
+        0.014353901147842407,
+        1.4593145847320557,
+        0.10809039324522018
+      ]
+    },
+    {
+      "name": "mp_361",
+      "mpIndex": 361,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13698,
+      "restPosition": [
+        0.06145019829273224,
+        1.4448152780532837,
+        0.05228596180677414
+      ]
+    },
+    {
+      "name": "mp_362",
+      "mpIndex": 362,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12636,
+      "restPosition": [
+        0.016014620661735535,
+        1.4870145320892334,
+        0.0916748121380806
+      ]
+    },
+    {
+      "name": "mp_363",
+      "mpIndex": 363,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16298,
+      "restPosition": [
+        0.00994659960269928,
+        1.4620399475097656,
+        0.11192282289266586
+      ]
+    },
+    {
+      "name": "mp_364",
+      "mpIndex": 364,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14265,
+      "restPosition": [
+        0.04641854763031006,
+        1.4136022329330444,
+        0.06938285380601883
+      ]
+    },
+    {
+      "name": "mp_365",
+      "mpIndex": 365,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14293,
+      "restPosition": [
+        0.04616305232048035,
+        1.407044529914856,
+        0.06165411323308945
+      ]
+    },
+    {
+      "name": "mp_366",
+      "mpIndex": 366,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13621,
+      "restPosition": [
+        0.06255733966827393,
+        1.4607837200164795,
+        0.06499684602022171
+      ]
+    },
+    {
+      "name": "mp_367",
+      "mpIndex": 367,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14180,
+      "restPosition": [
+        0.05325305461883545,
+        1.4236091375350952,
+        0.06165411323308945
+      ]
+    },
+    {
+      "name": "mp_368",
+      "mpIndex": 368,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10182,
+      "restPosition": [
+        0.06264249980449677,
+        1.501258373260498,
+        0.05635259300470352
+      ]
+    },
+    {
+      "name": "mp_369",
+      "mpIndex": 369,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4386,
+      "restPosition": [
+        0.0227852463722229,
+        1.3944188356399536,
+        0.09037604182958603
+      ]
+    },
+    {
+      "name": "mp_370",
+      "mpIndex": 370,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19649,
+      "restPosition": [
+        0.0014513880014419556,
+        1.4472637176513672,
+        0.11051759868860245
+      ]
+    },
+    {
+      "name": "mp_371",
+      "mpIndex": 371,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16446,
+      "restPosition": [
+        0.021486476063728333,
+        1.4619760513305664,
+        0.09721054881811142
+      ]
+    },
+    {
+      "name": "mp_372",
+      "mpIndex": 372,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10539,
+      "restPosition": [
+        0.059746891260147095,
+        1.4868443012237549,
+        0.06767954677343369
+      ]
+    },
+    {
+      "name": "mp_373",
+      "mpIndex": 373,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11699,
+      "restPosition": [
+        0.03651811182498932,
+        1.4860351085662842,
+        0.09114252775907516
+      ]
+    },
+    {
+      "name": "mp_374",
+      "mpIndex": 374,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11738,
+      "restPosition": [
+        0.030833333730697632,
+        1.4853538274765015,
+        0.09310133010149002
+      ]
+    },
+    {
+      "name": "mp_375",
+      "mpIndex": 375,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14466,
+      "restPosition": [
+        0.023892387747764587,
+        1.4209903478622437,
+        0.09721054881811142
+      ]
+    },
+    {
+      "name": "mp_376",
+      "mpIndex": 376,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13607,
+      "restPosition": [
+        0.057128071784973145,
+        1.4498826265335083,
+        0.07247009128332138
+      ]
+    },
+    {
+      "name": "mp_377",
+      "mpIndex": 377,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4397,
+      "restPosition": [
+        0.012373805046081543,
+        1.386881709098816,
+        0.0951027050614357
+      ]
+    },
+    {
+      "name": "mp_378",
+      "mpIndex": 378,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4366,
+      "restPosition": [
+        0.02959844470024109,
+        1.3948659896850586,
+        0.08136983960866928
+      ]
+    },
+    {
+      "name": "mp_379",
+      "mpIndex": 379,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4355,
+      "restPosition": [
+        0.03743363916873932,
+        1.3992732763290405,
+        0.07210812717676163
+      ]
+    },
+    {
+      "name": "mp_380",
+      "mpIndex": 380,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12885,
+      "restPosition": [
+        0.02640475332736969,
+        1.4858009815216064,
+        0.09299487620592117
+      ]
+    },
+    {
+      "name": "mp_381",
+      "mpIndex": 381,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12867,
+      "restPosition": [
+        0.020847737789154053,
+        1.4863332509994507,
+        0.09178126603364944
+      ]
+    },
+    {
+      "name": "mp_382",
+      "mpIndex": 382,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12851,
+      "restPosition": [
+        0.017994701862335205,
+        1.4865036010742188,
+        0.09107866138219833
+      ]
+    },
+    {
+      "name": "mp_383",
+      "mpIndex": 383,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10657,
+      "restPosition": [
+        0.05859716236591339,
+        1.4978092908859253,
+        0.06744534522294998
+      ]
+    },
+    {
+      "name": "mp_384",
+      "mpIndex": 384,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11598,
+      "restPosition": [
+        0.02129484713077545,
+        1.4919328689575195,
+        0.09278195351362228
+      ]
+    },
+    {
+      "name": "mp_385",
+      "mpIndex": 385,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11607,
+      "restPosition": [
+        0.027341574430465698,
+        1.4947006702423096,
+        0.09476204961538315
+      ]
+    },
+    {
+      "name": "mp_386",
+      "mpIndex": 386,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11568,
+      "restPosition": [
+        0.03211081027984619,
+        1.495296835899353,
+        0.09523045271635056
+      ]
+    },
+    {
+      "name": "mp_387",
+      "mpIndex": 387,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11555,
+      "restPosition": [
+        0.036986514925956726,
+        1.4947220087051392,
+        0.09416589885950089
+      ]
+    },
+    {
+      "name": "mp_388",
+      "mpIndex": 388,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10914,
+      "restPosition": [
+        0.04090411961078644,
+        1.4927632808685303,
+        0.09056767076253891
+      ]
+    },
+    {
+      "name": "mp_389",
+      "mpIndex": 389,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10128,
+      "restPosition": [
+        0.06666655838489532,
+        1.5057721138000488,
+        0.039851851761341095
+      ]
+    },
+    {
+      "name": "mp_390",
+      "mpIndex": 390,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11698,
+      "restPosition": [
+        0.03903047740459442,
+        1.4868443012237549,
+        0.08954568952322006
+      ]
+    },
+    {
+      "name": "mp_391",
+      "mpIndex": 391,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17161,
+      "restPosition": [
+        0.017270803451538086,
+        1.4381297826766968,
+        0.1042579635977745
+      ]
+    },
+    {
+      "name": "mp_392",
+      "mpIndex": 392,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17383,
+      "restPosition": [
+        0.012906089425086975,
+        1.4514155387878418,
+        0.10323598235845566
+      ]
+    },
+    {
+      "name": "mp_393",
+      "mpIndex": 393,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 20128,
+      "restPosition": [
+        0.007306486368179321,
+        1.4407912492752075,
+        0.10847363620996475
+      ]
+    },
+    {
+      "name": "mp_394",
+      "mpIndex": 394,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14302,
+      "restPosition": [
+        0.03815753757953644,
+        1.4054902791976929,
+        0.07702641934156418
+      ]
+    },
+    {
+      "name": "mp_395",
+      "mpIndex": 395,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4551,
+      "restPosition": [
+        0.03147207200527191,
+        1.4005720615386963,
+        0.08313701301813126
+      ]
+    },
+    {
+      "name": "mp_396",
+      "mpIndex": 396,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5510,
+      "restPosition": [
+        0.013374492526054382,
+        1.3909696340560913,
+        0.09833898395299911
+      ]
+    },
+    {
+      "name": "mp_397",
+      "mpIndex": 397,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14142,
+      "restPosition": [
+        0.05193299055099487,
+        1.4149861335754395,
+        0.055671267211437225
+      ]
+    },
+    {
+      "name": "mp_398",
+      "mpIndex": 398,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12626,
+      "restPosition": [
+        0.01784566044807434,
+        1.489037275314331,
+        0.09114252775907516
+      ]
+    },
+    {
+      "name": "mp_399",
+      "mpIndex": 399,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16146,
+      "restPosition": [
+        0.00894591212272644,
+        1.4738140106201172,
+        0.10361922532320023
+      ]
+    },
+    {
+      "name": "mp_400",
+      "mpIndex": 400,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4341,
+      "restPosition": [
+        0.021763265132904053,
+        1.3897559642791748,
+        0.08741656690835953
+      ]
+    },
+    {
+      "name": "mp_401",
+      "mpIndex": 401,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13629,
+      "restPosition": [
+        0.059661731123924255,
+        1.4478386640548706,
+        0.06386841088533401
+      ]
+    },
+    {
+      "name": "mp_402",
+      "mpIndex": 402,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16976,
+      "restPosition": [
+        0.011628612875938416,
+        1.4242053031921387,
+        0.1069832369685173
+      ]
+    },
+    {
+      "name": "mp_403",
+      "mpIndex": 403,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5145,
+      "restPosition": [
+        0.012884795665740967,
+        1.4214800596237183,
+        0.10694066435098648
+      ]
+    },
+    {
+      "name": "mp_404",
+      "mpIndex": 404,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4741,
+      "restPosition": [
+        0.014140978455543518,
+        1.4184353351593018,
+        0.1074303612112999
+      ]
+    },
+    {
+      "name": "mp_405",
+      "mpIndex": 405,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4702,
+      "restPosition": [
+        0.015162959694862366,
+        1.4146881103515625,
+        0.10625933855772018
+      ]
+    },
+    {
+      "name": "mp_406",
+      "mpIndex": 406,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4665,
+      "restPosition": [
+        0.016419142484664917,
+        1.4106640815734863,
+        0.10157526284456253
+      ]
+    },
+    {
+      "name": "mp_407",
+      "mpIndex": 407,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18742,
+      "restPosition": [
+        0.020570948719978333,
+        1.4242478609085083,
+        0.10083005577325821
+      ]
+    },
+    {
+      "name": "mp_408",
+      "mpIndex": 408,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16611,
+      "restPosition": [
+        0.021997466683387756,
+        1.425099492073059,
+        0.10097909718751907
+      ]
+    },
+    {
+      "name": "mp_409",
+      "mpIndex": 409,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16615,
+      "restPosition": [
+        0.023466557264328003,
+        1.4253337383270264,
+        0.10006356984376907
+      ]
+    },
+    {
+      "name": "mp_410",
+      "mpIndex": 410,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14385,
+      "restPosition": [
+        0.027448028326034546,
+        1.430401086807251,
+        0.09908417612314224
+      ]
+    },
+    {
+      "name": "mp_411",
+      "mpIndex": 411,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13636,
+      "restPosition": [
+        0.04869672656059265,
+        1.4440062046051025,
+        0.08241311460733414
+      ]
+    },
+    {
+      "name": "mp_412",
+      "mpIndex": 412,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12325,
+      "restPosition": [
+        0.008690416812896729,
+        1.4794561862945557,
+        0.10017003864049911
+      ]
+    },
+    {
+      "name": "mp_413",
+      "mpIndex": 413,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12499,
+      "restPosition": [
+        0.012331217527389526,
+        1.491443157196045,
+        0.09280324727296829
+      ]
+    },
+    {
+      "name": "mp_414",
+      "mpIndex": 414,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12523,
+      "restPosition": [
+        0.015759125351905823,
+        1.4916774034500122,
+        0.09199418872594833
+      ]
+    },
+    {
+      "name": "mp_415",
+      "mpIndex": 415,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 18744,
+      "restPosition": [
+        0.01914443075656891,
+        1.4239498376846313,
+        0.10134104639291763
+      ]
+    },
+    {
+      "name": "mp_416",
+      "mpIndex": 416,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14191,
+      "restPosition": [
+        0.04914383590221405,
+        1.4291023015975952,
+        0.07368368655443192
+      ]
+    },
+    {
+      "name": "mp_417",
+      "mpIndex": 417,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12400,
+      "restPosition": [
+        0.006561294198036194,
+        1.4907405376434326,
+        0.09759379178285599
+      ]
+    },
+    {
+      "name": "mp_418",
+      "mpIndex": 418,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4471,
+      "restPosition": [
+        0.019527673721313477,
+        1.4053624868392944,
+        0.09618856757879257
+      ]
+    },
+    {
+      "name": "mp_419",
+      "mpIndex": 419,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12270,
+      "restPosition": [
+        0.0046450793743133545,
+        1.4757301807403564,
+        0.10691937059164047
+      ]
+    },
+    {
+      "name": "mp_420",
+      "mpIndex": 420,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16315,
+      "restPosition": [
+        0.013012543320655823,
+        1.4640412330627441,
+        0.10455603152513504
+      ]
+    },
+    {
+      "name": "mp_421",
+      "mpIndex": 421,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5438,
+      "restPosition": [
+        0.00966981053352356,
+        1.4027862548828125,
+        0.10129847377538681
+      ]
+    },
+    {
+      "name": "mp_422",
+      "mpIndex": 422,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14322,
+      "restPosition": [
+        0.032259851694107056,
+        1.4163274765014648,
+        0.09035476297140121
+      ]
+    },
+    {
+      "name": "mp_423",
+      "mpIndex": 423,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17191,
+      "restPosition": [
+        0.024914368987083435,
+        1.4488818645477295,
+        0.09661438316106796
+      ]
+    },
+    {
+      "name": "mp_424",
+      "mpIndex": 424,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4491,
+      "restPosition": [
+        0.026213139295578003,
+        1.4105576276779175,
+        0.09312262386083603
+      ]
+    },
+    {
+      "name": "mp_425",
+      "mpIndex": 425,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13589,
+      "restPosition": [
+        0.037646546959877014,
+        1.4497973918914795,
+        0.09342069178819656
+      ]
+    },
+    {
+      "name": "mp_426",
+      "mpIndex": 426,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16487,
+      "restPosition": [
+        0.03049267828464508,
+        1.442324161529541,
+        0.09603952616453171
+      ]
+    },
+    {
+      "name": "mp_427",
+      "mpIndex": 427,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13655,
+      "restPosition": [
+        0.04247966408729553,
+        1.4408550262451172,
+        0.08833207935094833
+      ]
+    },
+    {
+      "name": "mp_428",
+      "mpIndex": 428,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 5484,
+      "restPosition": [
+        0.011990562081336975,
+        1.3953343629837036,
+        0.10078748315572739
+      ]
+    },
+    {
+      "name": "mp_429",
+      "mpIndex": 429,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16414,
+      "restPosition": [
+        0.016440436244010925,
+        1.4607411623001099,
+        0.09978679567575455
+      ]
+    },
+    {
+      "name": "mp_430",
+      "mpIndex": 430,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14313,
+      "restPosition": [
+        0.03622002899646759,
+        1.412090539932251,
+        0.08422287553548813
+      ]
+    },
+    {
+      "name": "mp_431",
+      "mpIndex": 431,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 4544,
+      "restPosition": [
+        0.02959844470024109,
+        1.4057031869888306,
+        0.0875655934214592
+      ]
+    },
+    {
+      "name": "mp_432",
+      "mpIndex": 432,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14331,
+      "restPosition": [
+        0.03604970872402191,
+        1.423694372177124,
+        0.08997152000665665
+      ]
+    },
+    {
+      "name": "mp_433",
+      "mpIndex": 433,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13673,
+      "restPosition": [
+        0.05363629758358002,
+        1.4381511211395264,
+        0.07127777487039566
+      ]
+    },
+    {
+      "name": "mp_434",
+      "mpIndex": 434,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14245,
+      "restPosition": [
+        0.042373210191726685,
+        1.424290418624878,
+        0.08283893018960953
+      ]
+    },
+    {
+      "name": "mp_435",
+      "mpIndex": 435,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14121,
+      "restPosition": [
+        0.0579371303319931,
+        1.4343186616897583,
+        0.0572042390704155
+      ]
+    },
+    {
+      "name": "mp_436",
+      "mpIndex": 436,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 14225,
+      "restPosition": [
+        0.03385670483112335,
+        1.435894250869751,
+        0.09444267302751541
+      ]
+    },
+    {
+      "name": "mp_437",
+      "mpIndex": 437,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16160,
+      "restPosition": [
+        0.012054443359375,
+        1.4697047472000122,
+        0.10234174877405167
+      ]
+    },
+    {
+      "name": "mp_438",
+      "mpIndex": 438,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17531,
+      "restPosition": [
+        0.012224763631820679,
+        1.453140139579773,
+        0.11215702444314957
+      ]
+    },
+    {
+      "name": "mp_439",
+      "mpIndex": 439,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17350,
+      "restPosition": [
+        0.015610083937644958,
+        1.4511175155639648,
+        0.10840975493192673
+      ]
+    },
+    {
+      "name": "mp_440",
+      "mpIndex": 440,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17580,
+      "restPosition": [
+        0.00922270119190216,
+        1.4565467834472656,
+        0.11537200957536697
+      ]
+    },
+    {
+      "name": "mp_441",
+      "mpIndex": 441,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11508,
+      "restPosition": [
+        0.016653358936309814,
+        1.49832022190094,
+        0.0944213941693306
+      ]
+    },
+    {
+      "name": "mp_442",
+      "mpIndex": 442,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11372,
+      "restPosition": [
+        0.027533188462257385,
+        1.5034301280975342,
+        0.09542208164930344
+      ]
+    },
+    {
+      "name": "mp_443",
+      "mpIndex": 443,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11299,
+      "restPosition": [
+        0.03568774461746216,
+        1.5047075748443604,
+        0.09427235275506973
+      ]
+    },
+    {
+      "name": "mp_444",
+      "mpIndex": 444,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11284,
+      "restPosition": [
+        0.04311840236186981,
+        1.5029830932617188,
+        0.09103607386350632
+      ]
+    },
+    {
+      "name": "mp_445",
+      "mpIndex": 445,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11258,
+      "restPosition": [
+        0.048462510108947754,
+        1.50015127658844,
+        0.08639458566904068
+      ]
+    },
+    {
+      "name": "mp_446",
+      "mpIndex": 446,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10725,
+      "restPosition": [
+        0.049995481967926025,
+        1.4891437292099,
+        0.07956007868051529
+      ]
+    },
+    {
+      "name": "mp_447",
+      "mpIndex": 447,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10450,
+      "restPosition": [
+        0.06391997635364532,
+        1.4754747152328491,
+        0.06340000778436661
+      ]
+    },
+    {
+      "name": "mp_448",
+      "mpIndex": 448,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13108,
+      "restPosition": [
+        0.04577980935573578,
+        1.4797968864440918,
+        0.08522356301546097
+      ]
+    },
+    {
+      "name": "mp_449",
+      "mpIndex": 449,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13249,
+      "restPosition": [
+        0.03860466182231903,
+        1.4768799543380737,
+        0.08997152000665665
+      ]
+    },
+    {
+      "name": "mp_450",
+      "mpIndex": 450,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13257,
+      "restPosition": [
+        0.03185531497001648,
+        1.4773483276367188,
+        0.09201546758413315
+      ]
+    },
+    {
+      "name": "mp_451",
+      "mpIndex": 451,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13267,
+      "restPosition": [
+        0.024296924471855164,
+        1.4785618782043457,
+        0.09280324727296829
+      ]
+    },
+    {
+      "name": "mp_452",
+      "mpIndex": 452,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13174,
+      "restPosition": [
+        0.01822890341281891,
+        1.4805207252502441,
+        0.0926116332411766
+      ]
+    },
+    {
+      "name": "mp_453",
+      "mpIndex": 453,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 13004,
+      "restPosition": [
+        0.014460355043411255,
+        1.4815852642059326,
+        0.09359102696180344
+      ]
+    },
+    {
+      "name": "mp_454",
+      "mpIndex": 454,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10452,
+      "restPosition": [
+        0.06551682949066162,
+        1.475112795829773,
+        0.0579068586230278
+      ]
+    },
+    {
+      "name": "mp_455",
+      "mpIndex": 455,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17355,
+      "restPosition": [
+        0.015056505799293518,
+        1.4495205879211426,
+        0.10625933855772018
+      ]
+    },
+    {
+      "name": "mp_456",
+      "mpIndex": 456,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 16176,
+      "restPosition": [
+        0.00830717384815216,
+        1.468725323677063,
+        0.10838846117258072
+      ]
+    },
+    {
+      "name": "mp_457",
+      "mpIndex": 457,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17614,
+      "restPosition": [
+        0.007434234023094177,
+        1.4531826972961426,
+        0.11530812829732895
+      ]
+    },
+    {
+      "name": "mp_458",
+      "mpIndex": 458,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17677,
+      "restPosition": [
+        0.005326390266418457,
+        1.4500741958618164,
+        0.10525865107774734
+      ]
+    },
+    {
+      "name": "mp_459",
+      "mpIndex": 459,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17617,
+      "restPosition": [
+        0.008328467607498169,
+        1.452224612236023,
+        0.11373256891965866
+      ]
+    },
+    {
+      "name": "mp_460",
+      "mpIndex": 460,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17366,
+      "restPosition": [
+        0.013097703456878662,
+        1.4477534294128418,
+        0.10323598235845566
+      ]
+    },
+    {
+      "name": "mp_461",
+      "mpIndex": 461,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 19574,
+      "restPosition": [
+        0.004006341099739075,
+        1.4495419263839722,
+        0.11435002833604813
+      ]
+    },
+    {
+      "name": "mp_462",
+      "mpIndex": 462,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 17689,
+      "restPosition": [
+        0.003367602825164795,
+        1.447625756263733,
+        0.10715357214212418
+      ]
+    },
+    {
+      "name": "mp_463",
+      "mpIndex": 463,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12972,
+      "restPosition": [
+        0.013842910528182983,
+        1.4866526126861572,
+        0.09239871054887772
+      ]
+    },
+    {
+      "name": "mp_464",
+      "mpIndex": 464,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12993,
+      "restPosition": [
+        0.01077696681022644,
+        1.4852261543273926,
+        0.09452784806489944
+      ]
+    },
+    {
+      "name": "mp_465",
+      "mpIndex": 465,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 12364,
+      "restPosition": [
+        0.009478196501731873,
+        1.4840338230133057,
+        0.09638018161058426
+      ]
+    },
+    {
+      "name": "mp_466",
+      "mpIndex": 466,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10912,
+      "restPosition": [
+        0.042735159397125244,
+        1.4915282726287842,
+        0.08801271766424179
+      ]
+    },
+    {
+      "name": "mp_467",
+      "mpIndex": 467,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 10865,
+      "restPosition": [
+        0.04741925001144409,
+        1.4944026470184326,
+        0.08456353098154068
+      ]
+    },
+    {
+      "name": "mp_468",
+      "mpIndex": 468,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24206,
+      "restPosition": [
+        -0.03137976676225662,
+        1.492252230644226,
+        0.08588359504938126
+      ]
+    },
+    {
+      "name": "mp_469",
+      "mpIndex": 469,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24184,
+      "restPosition": [
+        -0.024928510189056396,
+        1.4915496110916138,
+        0.08722493797540665
+      ]
+    },
+    {
+      "name": "mp_470",
+      "mpIndex": 470,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8172,
+      "restPosition": [
+        -0.03016616404056549,
+        1.4962337017059326,
+        0.09567757695913315
+      ]
+    },
+    {
+      "name": "mp_471",
+      "mpIndex": 471,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24225,
+      "restPosition": [
+        -0.03806522488594055,
+        1.4917625188827515,
+        0.08439319580793381
+      ]
+    },
+    {
+      "name": "mp_472",
+      "mpIndex": 472,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 8572,
+      "restPosition": [
+        -0.030677154660224915,
+        1.4857796430587769,
+        0.09256904572248459
+      ]
+    },
+    {
+      "name": "mp_473",
+      "mpIndex": 473,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24333,
+      "restPosition": [
+        0.031535953283309937,
+        1.4920393228530884,
+        0.08616036921739578
+      ]
+    },
+    {
+      "name": "mp_474",
+      "mpIndex": 474,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24345,
+      "restPosition": [
+        0.038178831338882446,
+        1.4914644956588745,
+        0.08462739735841751
+      ]
+    },
+    {
+      "name": "mp_475",
+      "mpIndex": 475,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11544,
+      "restPosition": [
+        0.030471384525299072,
+        1.4961485862731934,
+        0.09591177850961685
+      ]
+    },
+    {
+      "name": "mp_476",
+      "mpIndex": 476,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 24307,
+      "restPosition": [
+        0.025105983018875122,
+        1.4913792610168457,
+        0.0875655934214592
+      ]
+    },
+    {
+      "name": "mp_477",
+      "mpIndex": 477,
+      "meshName": "Ada_FaceMesh_LOD0_1",
+      "vertexIndex": 11715,
+      "restPosition": [
+        0.030748173594474792,
+        1.4855880737304688,
+        0.09280324727296829
+      ]
+    }
+  ]
+}

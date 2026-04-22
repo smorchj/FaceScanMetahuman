@@ -37,10 +37,15 @@ export function solveWarp(sources, targets) {
   const A = new Float64Array(dim * (dim + 3));
   const stride = dim + 3;
 
+  // TPS regularization: tiny diagonal lambda so the kernel matrix is
+  // well-conditioned even when two anchors end up arbitrarily close.
+  // At this scale it acts as a numerical safety net, not a smoother.
+  const lambda = 1e-6;
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
       A[i * stride + j] = kernel(sources[i], sources[j]);
     }
+    A[i * stride + i] += lambda;
     A[i * stride + n + 0] = 1;
     A[i * stride + n + 1] = sources[i][0];
     A[i * stride + n + 2] = sources[i][1];
