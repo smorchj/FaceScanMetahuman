@@ -70,7 +70,9 @@
       resetBtn:    document.getElementById('reset'),
       statusEl:    document.getElementById('status'),
       glbUrl:      params.get('glb')     || 'samples/ada/ada.glb',
+      mappingUrl:  params.get('materials') || 'samples/ada/mh_materials.json',
       anchorsUrl:  params.get('anchors') || 'samples/ada/anchors.json',
+      characterId: params.get('id')      || 'ada',
     }).catch((err) => {
       console.error('[demo] failed', err);
       document.getElementById('status').textContent = 'failed: ' + (err.message || err);

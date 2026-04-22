@@ -6,15 +6,11 @@
 // live update. The goal is to see "that looks like me-ish" and move on.
 
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { mount } from './viewer.js';
 
 import { MP_INDICES } from './mp_indices.js';
 import { solveWarp, applyWarp, procrustesAlign, applyRigid } from './warp.js';
 
-const DRACO_DECODER = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/';
 const MP_BUNDLE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/vision_bundle.mjs';
 const MP_WASM   = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm';
 const MP_MODEL  = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
@@ -25,19 +21,22 @@ export async function start(opts) {
 
   const setStatus = (s) => { statusEl.textContent = s; };
 
-  setStatus('fetching GLB and anchors...');
-  const [gltf, anchorsData] = await Promise.all([
-    loadGlb(glbUrl),
+  setStatus('fetching GLB, materials, and anchors...');
+  const [three, anchorsData] = await Promise.all([
+    mount(stage, {
+      glbUrl,
+      mappingUrl: opts.mappingUrl,
+      autoRotate: false,
+      interactive: true,
+      characterId: opts.characterId,
+    }),
     fetch(anchorsUrl).then((r) => {
       if (!r.ok) throw new Error('anchors: ' + r.status + ' ' + anchorsUrl);
       return r.json();
     }),
   ]);
 
-  const three = buildScene(stage);
-  three.scene.add(gltf.scene);
-
-  const skin = findSkinMesh(gltf.scene, anchorsData.anchors[0].meshName);
+  const skin = findSkinMesh(three.gltf.scene, anchorsData.anchors[0].meshName);
   if (!skin) throw new Error('could not find skin mesh ' + anchorsData.anchors[0].meshName);
 
   // Snapshot the rest pose so every warp starts from identity.
@@ -60,7 +59,7 @@ export async function start(opts) {
     };
   }).filter((a) => a.mpIdx !== undefined);
 
-  frameHead(gltf.scene, three.camera, three.controls);
+  frameHead(three.gltf.scene, three.camera, three.controls);
 
   setStatus('loading MediaPipe face landmarker...');
   const vision = await import(MP_BUNDLE);
@@ -190,12 +189,6 @@ function runWarp(mpLandmarks, anchors, skin, restPositions) {
 
 // --- plumbing ---
 
-function loadGlb(url) {
-  const draco = new DRACOLoader().setDecoderPath(DRACO_DECODER);
-  const loader = new GLTFLoader().setDRACOLoader(draco);
-  return new Promise((res, rej) => loader.load(url, res, undefined, rej));
-}
-
 function findSkinMesh(root, preferredName) {
   // First, try the name that appears in the anchors file. If that
   // mesh is not present (e.g. loading a different MH GLB), fall back
@@ -212,42 +205,6 @@ function findSkinMesh(root, preferredName) {
   candidates.sort((a, b) =>
     b.geometry.attributes.position.count - a.geometry.attributes.position.count);
   return candidates[0] || null;
-}
-
-function buildScene(stage) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(stage.clientWidth, stage.clientHeight);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  stage.appendChild(renderer.domElement);
-
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0b0d11);
-
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-
-  const camera = new THREE.PerspectiveCamera(
-    32, stage.clientWidth / stage.clientHeight, 0.01, 20);
-  camera.position.set(0, 1.6, 0.6);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
-
-  (function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
-  })();
-
-  window.addEventListener('resize', () => {
-    renderer.setSize(stage.clientWidth, stage.clientHeight);
-    camera.aspect = stage.clientWidth / stage.clientHeight;
-    camera.updateProjectionMatrix();
-  });
-
-  return { renderer, scene, camera, controls };
 }
 
 function frameHead(root, camera, controls) {

@@ -60,6 +60,7 @@
       downloadBtn: document.getElementById('download'),
       statusEl:    document.getElementById('status'),
       glbUrl:      params.get('glb') || 'samples/ada/ada.glb',
+      mappingUrl:  params.get('materials') || 'samples/ada/mh_materials.json',
       characterId: params.get('id')  || 'ada',
     }).catch((err) => {
       console.error('[auto-anchors] failed', err);
