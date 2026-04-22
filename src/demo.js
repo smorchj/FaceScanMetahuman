@@ -190,18 +190,29 @@ export async function start(opts) {
     setStatus('capture stopped.');
   }
 
-  function captureTick() {
-    if (!latest) return;
+  async function captureTick() {
+    if (!latest || !latestMatrix) return;
     try {
-      // Running average of the user's raw 478 landmarks. A few frames
-      // smooth out MP's per-frame jitter without hiding identity.
       userRecent.push(latest);
       if (userRecent.length > USER_SMOOTH_N) userRecent.shift();
       const userAvg = averageLandmarks(userRecent);
 
-      const targets = latticeTargets(userAvg, cachedAdaLmRaw, cachedAnchors, cachedMpToMh);
+      // Pose-match Ada: render her from the detect camera rotated to
+      // match the user's current head rotation, then run MP on that
+      // render. Both lattices are now at the same pose; rigid-align
+      // residual becomes identity at that pose, and we un-rotate it
+      // back to canonical before writing into MH space.
+      const userQuat = rotationFromMatrix16(latestMatrix);
+      const adaLmPose = await renderAdaPoseMatched(
+        three, userQuat, HARDCODED_FOV, imgLandmarker,
+      );
+      if (!adaLmPose) return;
+
+      const targets = latticeTargetsPoseMatched(
+        userAvg, adaLmPose, userQuat, cachedAnchors, cachedMpToMh,
+      );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
-      setStatus('capturing (live lattice)\n'
+      setStatus('capturing (pose-matched lattice)\n'
         + 'smoothed frames: ' + userRecent.length + '\n'
         + 'mean residual: ' + stats.meanResidual.toFixed(5));
     } catch (err) {
@@ -414,27 +425,45 @@ function averageLandmarks(frames) {
   return out;
 }
 
-// The lattice approach: rigid-align the user's full MP landmark cloud
-// to Ada's full MP landmark cloud (Procrustes absorbs translation,
-// rotation, uniform scale = pose + overall size). The residual
-// per-anchor difference is identity shape delta, in MP canonical
-// space. Scale it through mpToMh to land in MH metres and add to
-// each anchor's rest position.
-function latticeTargets(userLm, adaLm, anchors, mpToMh) {
+// Pose-matched lattice warp.
+//
+//   userLm:        user's 478 landmarks at current head rotation R
+//   adaPoseMatched: 478 landmarks on Ada, rendered at the same R
+//   userQuat:      the rotation R itself (canonical -> camera)
+//
+// Both lattices are at the same pose, so Procrustes residual is close
+// to pure identity at that pose. We then un-rotate by R^-1 to bring
+// the delta back into canonical frame, scale via mpToMh, and add to
+// each anchor's MH rest position.
+function latticeTargetsPoseMatched(userLm, adaPoseMatched, userQuat, anchors, mpToMh) {
   const userPts = userLm.map(mpToCanonical);
-  const adaPts  = adaLm.map(mpToCanonical);
+  const adaPts  = adaPoseMatched.map(mpToCanonical);
   const rigid = procrustesAlign(adaPts, userPts);
   const userAligned = userPts.map((p) => applyRigid(rigid, p, [0, 0, 0]));
-  const s = mpToMh.scale, R = mpToMh.R;
+
+  // R^-1 as a row-major 3x3 for un-rotating the residual.
+  const invMat = new THREE.Matrix4()
+    .makeRotationFromQuaternion(userQuat.clone().invert()).elements;
+  const iR = [
+    invMat[0], invMat[4], invMat[8],
+    invMat[1], invMat[5], invMat[9],
+    invMat[2], invMat[6], invMat[10],
+  ];
+  const s = mpToMh.scale, mR = mpToMh.R;
+
   return anchors.map((a) => {
     const i = a.mpIdx;
-    const dx = userAligned[i][0] - adaPts[i][0];
-    const dy = userAligned[i][1] - adaPts[i][1];
-    const dz = userAligned[i][2] - adaPts[i][2];
+    const rx = userAligned[i][0] - adaPts[i][0];
+    const ry = userAligned[i][1] - adaPts[i][1];
+    const rz = userAligned[i][2] - adaPts[i][2];
+    // Un-rotate to canonical.
+    const cx = iR[0]*rx + iR[1]*ry + iR[2]*rz;
+    const cy = iR[3]*rx + iR[4]*ry + iR[5]*rz;
+    const cz = iR[6]*rx + iR[7]*ry + iR[8]*rz;
     return [
-      a.mhRest[0] + s * (R[0]*dx + R[1]*dy + R[2]*dz),
-      a.mhRest[1] + s * (R[3]*dx + R[4]*dy + R[5]*dz),
-      a.mhRest[2] + s * (R[6]*dx + R[7]*dy + R[8]*dz),
+      a.mhRest[0] + s * (mR[0]*cx + mR[1]*cy + mR[2]*cz),
+      a.mhRest[1] + s * (mR[3]*cx + mR[4]*cy + mR[5]*cz),
+      a.mhRest[2] + s * (mR[6]*cx + mR[7]*cy + mR[8]*cz),
     ];
   });
 }
