@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FaceScanMetahuman — auto anchor map</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b0d11; color: #d8dae0;
+      font: 13px/1.45 system-ui, sans-serif; }
+    body { display: grid; grid-template-columns: 1fr 360px; }
+    #stage { min-height: 100vh; }
+    #side { padding: 16px; background: #111318; overflow-y: auto; max-height: 100vh; }
+    #side h2 { font-size: 14px; margin: 0 0 8px; color: #fff; }
+    #side p { color: #8a90a0; margin: 0 0 12px; }
+    button {
+      padding: 10px 14px; border: 0; border-radius: 4px; cursor: pointer;
+      background: #2a3560; color: #fff; font: inherit; font-weight: 600;
+      width: 100%; margin-top: 8px;
+    }
+    button:hover { background: #3a4780; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    #status {
+      margin-top: 10px; padding: 8px 10px; border-radius: 4px;
+      background: #1a1d25; color: #9cd1ff; font-size: 12px; min-height: 32px;
+      white-space: pre-wrap;
+    }
+    #thumb { margin-top: 12px; width: 100%; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <aside id="side">
+    <h2>Auto anchor map</h2>
+    <p>Runs MediaPipe on a rendered front-view of the MetaHuman, then
+       raycasts each of the 478 landmarks back into the scene to find
+       the corresponding MH skin vertex. The result is a dense,
+       self-consistent MP-to-MH correspondence that replaces the
+       hand-picked 41.</p>
+    <button id="run" disabled>Detect and map</button>
+    <button id="download" disabled>Download anchors_auto.json</button>
+    <div id="status">loading...</div>
+    <canvas id="thumb"></canvas>
+  </aside>
+
+  <script type="module">
+    import { start } from './src/auto_anchors.js';
+    const params = new URLSearchParams(location.search);
+    start({
+      stage:       document.getElementById('stage'),
+      thumb:       document.getElementById('thumb'),
+      runBtn:      document.getElementById('run'),
+      downloadBtn: document.getElementById('download'),
+      statusEl:    document.getElementById('status'),
+      glbUrl:      params.get('glb') || 'samples/ada/ada.glb',
+      characterId: params.get('id')  || 'ada',
+    }).catch((err) => {
+      console.error('[auto-anchors] failed', err);
+      document.getElementById('status').textContent = 'failed: ' + (err.message || err);
+    });
+  </script>
+</body>
+</html>

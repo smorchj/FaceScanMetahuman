@@ -44,9 +44,11 @@ export async function start(opts) {
   const posAttr = skin.geometry.attributes.position;
   const restPositions = new Float32Array(posAttr.array);
 
-  // Pair up MH rest anchors with MediaPipe indices.
+  // Pair up MH rest anchors with MediaPipe indices. Auto-generated
+  // anchor files carry `mpIndex` directly; the legacy hand-picked file
+  // relies on the name -> index lookup in mp_indices.js.
   const anchors = anchorsData.anchors.map((a) => {
-    const mpIdx = MP_INDICES[a.name];
+    const mpIdx = (a.mpIndex !== undefined) ? a.mpIndex : MP_INDICES[a.name];
     if (mpIdx === undefined) {
       console.warn('[demo] no MP index for', a.name, '-- will skip');
     }
