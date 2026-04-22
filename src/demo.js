@@ -172,6 +172,7 @@ export async function start(opts) {
   let cachedAdaLmRaw = null;         // Ada's 478 landmarks (head-on)
   const USER_SMOOTH_N = 6;           // running-average window for user lattice
   let userRecent = [];               // array of raw user 478-landmark arrays
+  let userQuatRef = null;            // user head quat at start, = "head-on" baseline
 
   async function startCapture() {
     if (!latest) { setStatus('no face detected'); return; }
@@ -186,6 +187,7 @@ export async function start(opts) {
       setStatus('anchors: ' + cachedAnchors.length + '. capturing live...');
     }
     userRecent = [];
+    userQuatRef = null;
     captureLoopId = setInterval(() => captureTick(), SAMPLE_INTERVAL_MS);
   }
 
@@ -210,12 +212,19 @@ export async function start(opts) {
       if (userRecent.length > USER_SMOOTH_N) userRecent.shift();
       const userAvg = averageLandmarks(userRecent);
 
-      // Apply user's head rotation to Ada's head bone so she visibly
-      // mirrors the user's pose. Both the main view and the offscreen
-      // MP detect view see a pose-matched Ada.
+      // Calibrate once per capture: the user is assumed head-on at
+      // the moment of Start. Whatever quaternion MP reports then is
+      // the "baseline"; actual pose rotation is the delta from it.
+      // Without this the raw MP quaternion contains MP's own
+      // canonical-to-camera transform and applying it directly
+      // cranks Ada's neck.
       const userQuat = rotationFromMatrix16(latestMatrix);
+      if (!userQuatRef) userQuatRef = userQuat.clone();
+      const userDeltaQuat = userQuatRef.clone().invert().premultiply(userQuat);
+
+      // Apply delta to Ada's head bone.
       if (headBone && headBoneRestQuat) {
-        headBone.quaternion.copy(headBoneRestQuat).multiply(userQuat);
+        headBone.quaternion.copy(headBoneRestQuat).multiply(userDeltaQuat);
       }
 
       // Render Ada head-on from detect camera (her head bone is now
@@ -226,7 +235,7 @@ export async function start(opts) {
       if (!adaLmPose) return;
 
       const targets = latticeTargetsPoseMatched(
-        userAvg, adaLmPose, userQuat, cachedAnchors, cachedMpToMh,
+        userAvg, adaLmPose, userDeltaQuat, cachedAnchors, cachedMpToMh,
       );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
       setStatus('capturing (pose-matched lattice)\n'
