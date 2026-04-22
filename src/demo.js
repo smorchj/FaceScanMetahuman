@@ -160,8 +160,10 @@ export async function start(opts) {
   const LIVE_UPDATE_EVERY_N = 3;
 
   let captureLoopId = null;
-  let triSamples = [];             // { R: 9-el row-major, deltas2D: N x [dx,dy] }
-  let cachedMpToMh = null;         // rigid+scale from MP canonical -> MH rest
+  let cachedMpToMh = null;           // rigid+scale MP canonical -> MH rest
+  let cachedAdaLmRaw = null;         // Ada's 478 landmarks (head-on)
+  const USER_SMOOTH_N = 6;           // running-average window for user lattice
+  let userRecent = [];               // array of raw user 478-landmark arrays
 
   async function startCapture() {
     if (!latest) { setStatus('no face detected'); return; }
@@ -169,12 +171,13 @@ export async function start(opts) {
     if (!cachedAnchors || Math.abs(cachedFovDeg - HARDCODED_FOV) > 0.01) {
       setStatus('building anchor map on Ada at FOV ' + HARDCODED_FOV + '°...');
       const built = await buildAnchorsAtFov(three, skin, imgLandmarker, HARDCODED_FOV);
-      cachedAnchors = built.anchors;
-      cachedMpToMh  = built.mpToMh;
-      cachedFovDeg  = HARDCODED_FOV;
-      setStatus('anchors: ' + cachedAnchors.length + '. starting capture... turn your head slowly for best depth.');
+      cachedAnchors    = built.anchors;
+      cachedMpToMh     = built.mpToMh;
+      cachedAdaLmRaw   = built.adaLandmarksRaw;
+      cachedFovDeg     = HARDCODED_FOV;
+      setStatus('anchors: ' + cachedAnchors.length + '. capturing live...');
     }
-    triSamples = [];
+    userRecent = [];
     captureLoopId = setInterval(() => captureTick(), SAMPLE_INTERVAL_MS);
   }
 
@@ -184,45 +187,23 @@ export async function start(opts) {
       captureLoopId = null;
     }
     captureBtn.textContent = 'Start capture';
-    setStatus('capture stopped. samples: ' + triSamples.length);
+    setStatus('capture stopped.');
   }
 
-  async function captureTick() {
-    if (!latest || !latestMatrix) return;
+  function captureTick() {
+    if (!latest) return;
     try {
-      const userQuat = rotationFromMatrix16(latestMatrix);
-      const adaLm = await renderAdaPoseMatched(three, userQuat, HARDCODED_FOV, imgLandmarker);
-      if (!adaLm) return;
+      // Running average of the user's raw 478 landmarks. A few frames
+      // smooth out MP's per-frame jitter without hiding identity.
+      userRecent.push(latest);
+      if (userRecent.length > USER_SMOOTH_N) userRecent.shift();
+      const userAvg = averageLandmarks(userRecent);
 
-      // Per-anchor 2D delta in MP space. We keep the y-flip because
-      // MP canonical Y is up but image Y is down, and our rotation
-      // matrix is in canonical (Y up) coordinates.
-      const deltas2D = cachedAnchors.map((a) => {
-        const u = latest[a.mpIdx];
-        const d = adaLm[a.mpIdx];
-        return [(u.x - d.x), -((u.y - d.y))];
-      });
-
-      // Rotation from canonical to camera space as a row-major 3x3.
-      const R4 = new THREE.Matrix4().makeRotationFromQuaternion(userQuat).elements;
-      const R = [
-        R4[0], R4[4], R4[8],
-        R4[1], R4[5], R4[9],
-        R4[2], R4[6], R4[10],
-      ];
-      triSamples.push({ R, deltas2D });
-
-      if (triSamples.length >= 3 && triSamples.length % LIVE_UPDATE_EVERY_N === 0) {
-        const deltas3D = triangulateAnchorDeltas(triSamples, cachedAnchors.length);
-        const targets = buildTargetsFromDeltas3D(deltas3D, cachedAnchors, cachedMpToMh);
-        const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
-        setStatus('capturing (triangulated)\n'
-          + 'samples: ' + triSamples.length + '\n'
-          + 'mean residual: ' + stats.meanResidual.toFixed(5));
-      } else {
-        setStatus('capturing... samples: ' + triSamples.length
-          + (triSamples.length < 3 ? '  (need at least 3 angles)' : ''));
-      }
+      const targets = latticeTargets(userAvg, cachedAdaLmRaw, cachedAnchors, cachedMpToMh);
+      const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
+      setStatus('capturing (live lattice)\n'
+        + 'smoothed frames: ' + userRecent.length + '\n'
+        + 'mean residual: ' + stats.meanResidual.toFixed(5));
     } catch (err) {
       console.error('[demo] captureTick error:', err);
     }
@@ -412,6 +393,48 @@ function computeAlignedTargetsPoseMatched(userLm, adaLm, anchors) {
       rest[0] + scale * (R[0]*d[0] + R[1]*d[1] + R[2]*d[2]),
       rest[1] + scale * (R[3]*d[0] + R[4]*d[1] + R[5]*d[2]),
       rest[2] + scale * (R[6]*d[0] + R[7]*d[1] + R[8]*d[2]),
+    ];
+  });
+}
+
+// Average a list of 478-landmark frames element-wise. Returns a new
+// array of {x,y,z} objects.
+function averageLandmarks(frames) {
+  const n = frames[0].length;
+  const out = new Array(n);
+  const k = frames.length;
+  for (let i = 0; i < n; i++) {
+    let sx = 0, sy = 0, sz = 0;
+    for (const f of frames) {
+      const l = f[i];
+      sx += l.x; sy += l.y; sz += l.z;
+    }
+    out[i] = { x: sx / k, y: sy / k, z: sz / k };
+  }
+  return out;
+}
+
+// The lattice approach: rigid-align the user's full MP landmark cloud
+// to Ada's full MP landmark cloud (Procrustes absorbs translation,
+// rotation, uniform scale = pose + overall size). The residual
+// per-anchor difference is identity shape delta, in MP canonical
+// space. Scale it through mpToMh to land in MH metres and add to
+// each anchor's rest position.
+function latticeTargets(userLm, adaLm, anchors, mpToMh) {
+  const userPts = userLm.map(mpToCanonical);
+  const adaPts  = adaLm.map(mpToCanonical);
+  const rigid = procrustesAlign(adaPts, userPts);
+  const userAligned = userPts.map((p) => applyRigid(rigid, p, [0, 0, 0]));
+  const s = mpToMh.scale, R = mpToMh.R;
+  return anchors.map((a) => {
+    const i = a.mpIdx;
+    const dx = userAligned[i][0] - adaPts[i][0];
+    const dy = userAligned[i][1] - adaPts[i][1];
+    const dz = userAligned[i][2] - adaPts[i][2];
+    return [
+      a.mhRest[0] + s * (R[0]*dx + R[1]*dy + R[2]*dz),
+      a.mhRest[1] + s * (R[3]*dx + R[4]*dy + R[5]*dz),
+      a.mhRest[2] + s * (R[6]*dx + R[7]*dy + R[8]*dz),
     ];
   });
 }
@@ -758,16 +781,23 @@ async function buildAnchorsAtFov(three, skin, landmarker, fovDeg) {
     });
   }
 
-  // Compute one-shot MP-canonical -> MH-rest rigid+scale for later use
-  // when converting triangulated deltas back into MH space.
-  const adaPtsRest = out.map((a) => {
-    const l = landmarks[a.mpIdx];
-    return [l.x - 0.5, -(l.y - 0.5), -l.z];
-  });
+  // One-shot MP-canonical -> MH-rest rigid+scale from Ada's own
+  // landmarks; used every frame to convert user-identity deltas
+  // into MH-space offsets.
+  const adaPtsRest = out.map((a) => mpToCanonical(landmarks[a.mpIdx]));
   const mhRestPts = out.map((a) => a.mhRest);
   const mpToMh = procrustesAlign(mhRestPts, adaPtsRest);
 
-  return { anchors: out, mpToMh };
+  // Keep the full 478 raw landmarks too so capture-time Procrustes
+  // can rigid-align the user's full lattice to Ada's full lattice,
+  // not just the subset we anchor.
+  return { anchors: out, mpToMh, adaLandmarksRaw: landmarks };
+}
+
+// Convert one MP normalized-image landmark to the "canonical-ish"
+// 3D frame we use everywhere else (y up, z forward toward camera).
+function mpToCanonical(l) {
+  return [l.x - 0.5, -(l.y - 0.5), -l.z];
 }
 
 function drawOverlay(ctx, canvas, landmarks, anchors) {
