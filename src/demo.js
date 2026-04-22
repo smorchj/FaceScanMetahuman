@@ -54,6 +54,16 @@ export async function start(opts) {
   const headBoneRestQuat = headBone ? headBone.quaternion.clone() : null;
   console.log('[demo] head bone:', headBone ? headBone.name : '(not found)');
 
+  // Dynamic diffuse texture: seeded with Ada's existing skin color
+  // map, then painted live from the webcam during capture.
+  const faceTex = initFaceTexture(skin);
+  console.log('[demo] dynamic face texture: ', faceTex ? faceTex.size : '(skipped)');
+
+  // Hidden canvas that keeps a snapshot of the current webcam frame
+  // so getImageData sampling per anchor is cheap.
+  const sampleCanvas = document.createElement('canvas');
+  const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+
   // Snapshot rest positions for every head-adjacent mesh so the warp
   // can carry eyeballs, teeth, lashes, brows, and hair along with the
   // skin. Each entry: { mesh, rest (Float32Array), attr }. Reset
@@ -184,6 +194,11 @@ export async function start(opts) {
       cachedMpToMh     = built.mpToMh;
       cachedAdaLmRaw   = built.adaLandmarksRaw;
       cachedFovDeg     = HARDCODED_FOV;
+      // Cache each anchor's UV so the texture painter can find it fast.
+      const uvAttr = skin.geometry.attributes.uv;
+      for (const a of cachedAnchors) {
+        a.uv = uvAttr ? [uvAttr.getX(a.mhIdx), uvAttr.getY(a.mhIdx)] : null;
+      }
       setStatus('anchors: ' + cachedAnchors.length + '. capturing live...');
     }
     userRecent = [];
@@ -242,6 +257,15 @@ export async function start(opts) {
         userAvg, adaLmPose, userDeltaQuat, cachedAnchors, cachedMpToMh,
       );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
+
+      // Paint webcam pixels onto the face texture at visible anchors.
+      if (faceTex) {
+        paintFaceTextureFromWebcam(
+          faceTex, video, sampleCanvas, sampleCtx,
+          latest, cachedAnchors, cachedAdaLmRaw, userDeltaQuat,
+        );
+      }
+
       setStatus('capturing (pose-matched lattice)\n'
         + 'smoothed frames: ' + userRecent.length + '\n'
         + 'mean residual: ' + stats.meanResidual.toFixed(5));
@@ -314,6 +338,94 @@ function rotationFromMatrix16(m) {
   const scl = new THREE.Vector3();
   mat.decompose(pos, q, scl);
   return q;
+}
+
+// Set up a dynamic diffuse texture on the face skin material: copy
+// Ada's current base-color map into a canvas, wrap that canvas as a
+// CanvasTexture, and swap it in as material.map. The canvas is then
+// painted live during capture. Returns null if the material has no
+// existing map to seed from.
+function initFaceTexture(skin) {
+  const mat = Array.isArray(skin.material) ? skin.material[0] : skin.material;
+  if (!mat || !mat.map || !mat.map.image) return null;
+  const src = mat.map.image;
+  const size = Math.max(src.width || 0, src.height || 0) || 1024;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d', { willReadFrequently: false });
+  ctx.drawImage(src, 0, 0, size, size);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = mat.map.flipY;
+  texture.wrapS = mat.map.wrapS;
+  texture.wrapT = mat.map.wrapT;
+
+  mat.map = texture;
+  mat.needsUpdate = true;
+  return { canvas, ctx, texture, size };
+}
+
+// Visibility check: rotate each anchor's canonical +Z normal (proxied
+// by the anchor's own canonical position direction from face centre)
+// by the user's head rotation. If the resulting +Z is positive, the
+// anchor faces the camera and its landmark is sampleable.
+function anchorFacesCamera(anchor, userQuat, cachedAdaLmRaw) {
+  const l = cachedAdaLmRaw[anchor.mpIdx];
+  if (!l) return true;
+  // Canonical-ish direction: offset from face centre, normalised.
+  const dx = l.x - 0.5, dy = -(l.y - 0.5), dz = -l.z;
+  // Rotate by the user's head rotation (delta from head-on).
+  const v = new THREE.Vector3(dx, dy, dz).applyQuaternion(userQuat);
+  return v.z > 0.01;
+}
+
+// Paint current webcam pixels into the dynamic face texture at each
+// visible anchor's UV. Brush radius and alpha are tuned for dense
+// anchor layouts; with ~400 anchors the brushes overlap enough to
+// fill the face without visible holes after a few seconds of capture.
+function paintFaceTextureFromWebcam(
+  faceTex, video, sampleCanvas, sampleCtx,
+  userLm, anchors, adaRaw, userDeltaQuat,
+) {
+  if (!video.videoWidth) return;
+  if (sampleCanvas.width !== video.videoWidth
+   || sampleCanvas.height !== video.videoHeight) {
+    sampleCanvas.width = video.videoWidth;
+    sampleCanvas.height = video.videoHeight;
+  }
+  sampleCtx.drawImage(video, 0, 0);
+  const { canvas, ctx, size } = faceTex;
+
+  const BRUSH = 10;
+  const ALPHA = 0.6;
+  ctx.globalAlpha = ALPHA;
+
+  for (const a of anchors) {
+    if (!a.uv) continue;
+    if (!anchorFacesCamera(a, userDeltaQuat, adaRaw)) continue;
+    const lm = userLm[a.mpIdx];
+    if (!lm) continue;
+    const sx = Math.floor(lm.x * sampleCanvas.width);
+    const sy = Math.floor(lm.y * sampleCanvas.height);
+    if (sx < 0 || sy < 0 || sx >= sampleCanvas.width || sy >= sampleCanvas.height) continue;
+    const pix = sampleCtx.getImageData(sx, sy, 1, 1).data;
+    ctx.fillStyle = 'rgb(' + pix[0] + ',' + pix[1] + ',' + pix[2] + ')';
+
+    // glTF UV: u across, v down from top. CanvasTexture with flipY=false
+    // treats canvas (0,0)=top-left as UV (0,1). Canvas y = v * size.
+    // Ada's map was imported with flipY matching her original; we
+    // inherit it in initFaceTexture so we can paint directly at
+    // (u*size, v*size) without an extra flip.
+    const ux = a.uv[0] * size;
+    const uy = a.uv[1] * size;
+    ctx.beginPath();
+    ctx.arc(ux, uy, BRUSH, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1.0;
+  faceTex.texture.needsUpdate = true;
 }
 
 // Find the head bone on a MH skinned mesh. MH skeletons expose it as
