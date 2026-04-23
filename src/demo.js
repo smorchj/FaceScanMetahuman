@@ -240,26 +240,22 @@ export async function start(opts) {
       if (userRecent.length > USER_SMOOTH_N) userRecent.shift();
       const userAvg = averageLandmarks(userRecent);
 
-      // MP facial-transformation -> head bone rotation.
-      // Standard pattern: decompose the matrix into YXZ Euler
-      // (yaw/pitch/roll), subtract the baseline captured at Start
-      // (user assumed roughly head-on), mirror yaw and pitch so the
-      // viewer's perspective matches the webcam (selfie-mirror), and
-      // recompose into a quaternion applied on top of the bone's
-      // local rest.
+      // Convert MP's facial-transformation matrix to a three.js
+      // quaternion, then apply the standard "selfie mirror" flip.
+      // In mirror-space a rotation (axis, angle) becomes (mirrored
+      // axis, -angle) which is equivalent to negating the quaternion
+      // components parallel to the mirror plane. For a horizontal
+      // webcam mirror (x <-> -x) that means y <-> -y, z <-> -z on
+      // the quaternion. Subtract a baseline captured at Start so the
+      // user's first frame is treated as rest.
       const mpMat = new THREE.Matrix4().fromArray(latestMatrix);
-      const eulerNow = new THREE.Euler().setFromRotationMatrix(mpMat, 'YXZ');
-      if (!userQuatRef) {
-        // Stash baseline Euler inside userQuatRef for reuse.
-        userQuatRef = eulerNow.clone();
-      }
-      const dPitch = eulerNow.x - userQuatRef.x;
-      const dYaw   = eulerNow.y - userQuatRef.y;
-      const dRoll  = eulerNow.z - userQuatRef.z;
-      // Mirror yaw (webcam is selfie-mirrored relative to the 3D view)
-      // and pitch (MP's canonical pitch sign is opposite three.js).
-      const deltaEuler = new THREE.Euler(-dPitch, -dYaw, dRoll, 'YXZ');
-      const userDeltaQuat = new THREE.Quaternion().setFromEuler(deltaEuler);
+      const rawQuat = new THREE.Quaternion().setFromRotationMatrix(mpMat);
+      // Selfie-mirror: negate y and z.
+      rawQuat.y = -rawQuat.y;
+      rawQuat.z = -rawQuat.z;
+
+      if (!userQuatRef) userQuatRef = rawQuat.clone();
+      const userDeltaQuat = rawQuat.clone().multiply(userQuatRef.clone().invert());
 
       if (headBone && headBoneRestQuat) {
         headBone.quaternion.copy(headBoneRestQuat).multiply(userDeltaQuat);
@@ -370,21 +366,27 @@ function rotationFromMatrix16(m) {
 // existing map to seed from.
 function initFaceTexture(skin) {
   const mat = Array.isArray(skin.material) ? skin.material[0] : skin.material;
-  if (!mat || !mat.map || !mat.map.image) return null;
-  const src = mat.map.image;
-  const size = Math.max(src.width || 0, src.height || 0) || 1024;
-
+  if (!mat) return null;
+  const size = 1024;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
   const ctx = canvas.getContext('2d', { willReadFrequently: false });
-  ctx.drawImage(src, 0, 0, size, size);
+
+  const src = mat.map && mat.map.image;
+  if (src && src.width) {
+    ctx.drawImage(src, 0, 0, size, size);
+  } else {
+    // Fallback seed. Skin-ish so the face is recognisable before any
+    // capture has painted onto it.
+    ctx.fillStyle = '#b08066';
+    ctx.fillRect(0, 0, size, size);
+  }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.flipY = mat.map.flipY;
-  texture.wrapS = mat.map.wrapS;
-  texture.wrapT = mat.map.wrapT;
-
+  texture.flipY = mat.map ? mat.map.flipY : false;
+  texture.wrapS = mat.map ? mat.map.wrapS : THREE.ClampToEdgeWrapping;
+  texture.wrapT = mat.map ? mat.map.wrapT : THREE.ClampToEdgeWrapping;
   mat.map = texture;
   mat.needsUpdate = true;
   return { canvas, ctx, texture, size };
