@@ -456,19 +456,50 @@ function buildMpTriangles(tessConnections, anchors) {
   return out;
 }
 
-// For each face-mesh vertex, find the MP triangle that contains its
-// rest XY position (faces are front-facing enough that XY projection
-// identifies the right triangle). Returns array of {tri, a, b, c} or
-// null per vertex.
+// For each face-mesh vertex close enough to an anchor, assign an MP
+// triangle: either the one that contains the vertex (XY projection),
+// or the nearest by centroid distance. Nearest-triangle assignment
+// extrapolates barycentric slightly outside [0,1] for silhouette
+// verts, which avoids the "fragmented texture" artifact where a
+// triangle drawn by the renderer has one vertex with webcam UV and
+// another with Ada's original UV.
+//
+// Verts farther than FACE_REACH metres from any anchor keep their
+// original UV (null). That is the implicit face mask.
 function precomputeVertexContainment(skin, anchors, mpTriangles) {
   const posAttr = skin.geometry.attributes.position;
   const n = posAttr.count;
+  const FACE_REACH = 0.05;
+  const reachSq = FACE_REACH * FACE_REACH;
   const result = new Array(n);
+
+  // Precompute triangle centroids (XY) for the nearest-triangle query.
+  const centroids = mpTriangles.map((tri) => {
+    const A = anchors[tri[3]].mhRest;
+    const B = anchors[tri[4]].mhRest;
+    const C = anchors[tri[5]].mhRest;
+    return [(A[0] + B[0] + C[0]) / 3, (A[1] + B[1] + C[1]) / 3];
+  });
+
   for (let i = 0; i < n; i++) {
     const px = posAttr.getX(i);
     const py = posAttr.getY(i);
-    let best = null;
-    let bestBias = Infinity;
+    const pz = posAttr.getZ(i);
+
+    // Face mask: skip verts far from any anchor.
+    let minAnchorSq = Infinity;
+    for (let k = 0; k < anchors.length; k++) {
+      const r = anchors[k].mhRest;
+      const dx = px - r[0], dy = py - r[1], dz = pz - r[2];
+      const d = dx * dx + dy * dy + dz * dz;
+      if (d < minAnchorSq) minAnchorSq = d;
+    }
+    if (minAnchorSq > reachSq) { result[i] = null; continue; }
+
+    // Prefer a triangle that contains the vertex; fall back to the
+    // nearest one by centroid distance.
+    let bestInside = null, bestInsideBias = Infinity;
+    let bestNearest = null, bestNearestDist = Infinity;
     for (let t = 0; t < mpTriangles.length; t++) {
       const tri = mpTriangles[t];
       const A = anchors[tri[3]].mhRest;
@@ -476,21 +507,24 @@ function precomputeVertexContainment(skin, anchors, mpTriangles) {
       const C = anchors[tri[5]].mhRest;
       const bary = bary2d(px, py, A[0], A[1], B[0], B[1], C[0], C[1]);
       if (!bary) continue;
-      // Slack so sliver triangles at the silhouette catch verts a
-      // hair outside their boundary.
       const minAxis = Math.min(bary.a, bary.b, bary.c);
-      if (minAxis >= -0.002 && bary.a <= 1.002 && bary.b <= 1.002 && bary.c <= 1.002) {
-        // If multiple triangles contain this vertex, pick the one
-        // whose barycentric coords are most "interior" (farthest
-        // from any edge).
+      if (minAxis >= 0) {
         const bias = -minAxis;
-        if (bias < bestBias) {
-          bestBias = bias;
-          best = { tri: t, a: bary.a, b: bary.b, c: bary.c };
+        if (bias < bestInsideBias) {
+          bestInsideBias = bias;
+          bestInside = { tri: t, a: bary.a, b: bary.b, c: bary.c };
+        }
+      } else {
+        const cx = centroids[t][0], cy = centroids[t][1];
+        const dx = px - cx, dy = py - cy;
+        const dist = dx * dx + dy * dy;
+        if (dist < bestNearestDist) {
+          bestNearestDist = dist;
+          bestNearest = { tri: t, a: bary.a, b: bary.b, c: bary.c };
         }
       }
     }
-    result[i] = best;
+    result[i] = bestInside || bestNearest;
   }
   return result;
 }
