@@ -13,11 +13,19 @@
   }
   </script>
   <style>
-    html, body { margin: 0; height: 100%; background: #0b0d11; color: #d8dae0;
-      font: 13px/1.45 system-ui, sans-serif; }
-    body { display: grid; grid-template-columns: 1fr 360px; }
-    #stage { min-height: 100vh; }
-    #side { padding: 16px; background: #111318; overflow-y: auto; max-height: 100vh; }
+    html, body { margin: 0; min-height: 100%; background: #0b0d11; color: #d8dae0;
+      font: 13px/1.45 system-ui, sans-serif; overscroll-behavior: none; }
+    body { display: grid; grid-template-columns: 1fr 360px; height: 100vh; height: 100dvh; }
+    #stage { min-height: 50vh; }
+    #side { padding: 16px; background: #111318; overflow-y: auto; max-height: 100vh; max-height: 100dvh; }
+    @media (max-width: 720px) {
+      body { grid-template-columns: 1fr; grid-template-rows: 55vh 45vh; height: 100vh; height: 100dvh; }
+      #stage { min-height: 0; }
+      #side { max-height: none; padding: 12px; }
+      #side h2 { margin-top: 0; }
+      #side p { display: none; }
+      .videoWrap { max-width: 220px; }
+    }
     #side h2 { font-size: 14px; margin: 0 0 8px; color: #fff; }
     #side p { color: #8a90a0; margin: 0 0 12px; }
     video, #overlay {

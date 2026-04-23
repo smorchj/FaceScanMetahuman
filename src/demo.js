@@ -141,8 +141,15 @@ export async function start(opts) {
   });
 
   setStatus('requesting webcam...');
+  // Phone front cams rarely deliver exactly 640x480; use ideal hints so
+  // iOS/Android accept the constraints and fall back to a native size.
   const stream = await navigator.mediaDevices.getUserMedia({
-    video: { width: 640, height: 480, facingMode: 'user' }, audio: false,
+    video: {
+      width:  { ideal: 640 },
+      height: { ideal: 480 },
+      facingMode: 'user',
+    },
+    audio: false,
   });
   video.srcObject = stream;
   await new Promise((r) => video.addEventListener('loadeddata', r, { once: true }));
