@@ -561,24 +561,24 @@ function paintFaceTextureMpTriangles(
   const W = sampleCanvas.width, H = sampleCanvas.height;
 
   let painted = 0;
+  let skippedLm = 0, skippedArea = 0, skippedUv = 0, skippedAnchor = 0;
 
   for (const tri of triangles) {
     const mpA = tri[0], mpB = tri[1], mpC = tri[2];
     const ai = tri[3], bi = tri[4], ci = tri[5];
     const la = userLm[mpA], lb = userLm[mpB], lc = userLm[mpC];
-    if (!la || !lb || !lc) continue;
+    if (!la || !lb || !lc) { skippedLm++; continue; }
 
     const sx1 = la.x * W, sy1 = la.y * H;
     const sx2 = lb.x * W, sy2 = lb.y * H;
     const sx3 = lc.x * W, sy3 = lc.y * H;
-    // Build-time triangle enumeration does not enforce a consistent
-    // winding (we sort indices ascending), so signed-area sign is
-    // unreliable as a visibility test. Skip only degenerate slivers.
     const signedArea = (sx2 - sx1) * (sy3 - sy1) - (sx3 - sx1) * (sy2 - sy1);
-    if (Math.abs(signedArea) < 2) continue;
+    if (Math.abs(signedArea) < 2) { skippedArea++; continue; }
 
-    const uvA = anchors[ai].uv, uvB = anchors[bi].uv, uvC = anchors[ci].uv;
-    if (!uvA || !uvB || !uvC) continue;
+    const aA = anchors[ai], aB = anchors[bi], aC = anchors[ci];
+    if (!aA || !aB || !aC) { skippedAnchor++; continue; }
+    const uvA = aA.uv, uvB = aB.uv, uvC = aC.uv;
+    if (!uvA || !uvB || !uvC) { skippedUv++; continue; }
     const dx1 = uvA[0] * size, dy1 = (1 - uvA[1]) * size;
     const dx2 = uvB[0] * size, dy2 = (1 - uvB[1]) * size;
     const dx3 = uvC[0] * size, dy3 = (1 - uvC[1]) * size;
@@ -590,7 +590,10 @@ function paintFaceTextureMpTriangles(
   }
   if (!paintFaceTextureMpTriangles._n) paintFaceTextureMpTriangles._n = 0;
   if (paintFaceTextureMpTriangles._n++ % 13 === 0) {
-    console.log('[demo] paint tick: painted', painted, 'of', triangles.length);
+    console.log('[demo] paint tick: painted', painted, 'of', triangles.length,
+                '| skip lm:', skippedLm, 'area:', skippedArea,
+                'anchor:', skippedAnchor, 'uv:', skippedUv,
+                '| sampleAnchorUV:', anchors[0] && anchors[0].uv);
   }
   texture.needsUpdate = true;
 }
