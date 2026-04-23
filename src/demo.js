@@ -200,6 +200,16 @@ export async function start(opts) {
       cachedMpToMh     = built.mpToMh;
       cachedAdaLmRaw   = built.adaLandmarksRaw;
       cachedFovDeg     = HARDCODED_FOV;
+      // Cache each anchor's UV from the mesh's uv attribute so the
+      // texture painter can look it up without going through the
+      // geometry attribute every tick.
+      const uvAttr = skin.geometry.attributes.uv;
+      for (const a of cachedAnchors) {
+        a.uv = uvAttr ? [uvAttr.getX(a.mhIdx), uvAttr.getY(a.mhIdx)] : null;
+      }
+      console.log('[demo] sample anchor uvs:',
+                  cachedAnchors[0] && cachedAnchors[0].uv,
+                  cachedAnchors[1] && cachedAnchors[1].uv);
       // Build MP's canonical triangulation from its edge list, then
       // keep only triangles whose 3 MP indices all exist as anchors.
       const tess = FaceLandmarker.FACE_LANDMARKS_TESSELATION
