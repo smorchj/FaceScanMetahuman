@@ -240,25 +240,32 @@ export async function start(opts) {
       if (userRecent.length > USER_SMOOTH_N) userRecent.shift();
       const userAvg = averageLandmarks(userRecent);
 
-      // Convert MP's facial-transformation matrix to a three.js
-      // quaternion, then apply the standard "selfie mirror" flip.
-      // In mirror-space a rotation (axis, angle) becomes (mirrored
-      // axis, -angle) which is equivalent to negating the quaternion
-      // components parallel to the mirror plane. For a horizontal
-      // webcam mirror (x <-> -x) that means y <-> -y, z <-> -z on
-      // the quaternion. Subtract a baseline captured at Start so the
-      // user's first frame is treated as rest.
+      // Extract head rotation from MP's facial transformation matrix
+      // and apply it to the head bone in WORLD space. Applying in
+      // local space was shuffling axes because the bone's rest local
+      // quaternion is not identity, so a pure-yaw delta ended up
+      // mixing into roll once composed on top of the rest.
       const mpMat = new THREE.Matrix4().fromArray(latestMatrix);
       const rawQuat = new THREE.Quaternion().setFromRotationMatrix(mpMat);
-      // Selfie-mirror: negate y and z.
-      rawQuat.y = -rawQuat.y;
-      rawQuat.z = -rawQuat.z;
 
       if (!userQuatRef) userQuatRef = rawQuat.clone();
       const userDeltaQuat = rawQuat.clone().multiply(userQuatRef.clone().invert());
 
-      if (headBone && headBoneRestQuat) {
-        headBone.quaternion.copy(headBoneRestQuat).multiply(userDeltaQuat);
+      if (headBone && headBoneRestQuat && headBone.parent) {
+        // Rest world orientation of the head bone.
+        headBone.quaternion.copy(headBoneRestQuat);
+        headBone.parent.updateWorldMatrix(true, false);
+        headBone.updateWorldMatrix(false, false);
+        const restWorldQuat = new THREE.Quaternion();
+        headBone.getWorldQuaternion(restWorldQuat);
+        // Target world orientation: apply user delta (world space)
+        // on top of rest world.
+        const targetWorldQuat = userDeltaQuat.clone().multiply(restWorldQuat);
+        // Convert to local space of the head bone.
+        const parentWorldQuat = new THREE.Quaternion();
+        headBone.parent.getWorldQuaternion(parentWorldQuat);
+        const localTarget = parentWorldQuat.invert().multiply(targetWorldQuat);
+        headBone.quaternion.copy(localTarget);
       }
 
       // Render Ada head-on from detect camera (her head bone is now
@@ -549,9 +556,7 @@ function paintFaceTextureMpTriangles(
   const { ctx, size, texture } = faceTex;
   const W = sampleCanvas.width, H = sampleCanvas.height;
 
-  const n1 = new THREE.Vector3();
-  const n2 = new THREE.Vector3();
-  const cross = new THREE.Vector3();
+  let painted = 0;
 
   for (const tri of triangles) {
     const mpA = tri[0], mpB = tri[1], mpC = tri[2];
@@ -559,20 +564,14 @@ function paintFaceTextureMpTriangles(
     const la = userLm[mpA], lb = userLm[mpB], lc = userLm[mpC];
     if (!la || !lb || !lc) continue;
 
-    // Visibility via canonical normal rotated by user head delta.
-    const A = adaLmRaw[mpA], B = adaLmRaw[mpB], C = adaLmRaw[mpC];
-    n1.set(B.x - A.x, -(B.y - A.y), -(B.z - A.z));
-    n2.set(C.x - A.x, -(C.y - A.y), -(C.z - A.z));
-    cross.crossVectors(n1, n2).applyQuaternion(userDeltaQuat);
-    if (cross.z <= 0) continue;
-
-    // Secondary check: positive signed area in webcam (back-facing
-    // user landmarks have reversed winding).
     const sx1 = la.x * W, sy1 = la.y * H;
     const sx2 = lb.x * W, sy2 = lb.y * H;
     const sx3 = lc.x * W, sy3 = lc.y * H;
+    // Positive signed area in webcam space = front-facing. MP
+    // extrapolates occluded landmarks with similar winding, so this
+    // is not perfect, but it keeps the check simple.
     const signedArea = (sx2 - sx1) * (sy3 - sy1) - (sx3 - sx1) * (sy2 - sy1);
-    if (signedArea <= 2) continue;
+    if (signedArea <= 0) continue;
 
     const uvA = anchors[ai].uv, uvB = anchors[bi].uv, uvC = anchors[ci].uv;
     if (!uvA || !uvB || !uvC) continue;
