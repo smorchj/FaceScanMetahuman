@@ -571,11 +571,11 @@ function paintFaceTextureMpTriangles(
     const sx1 = la.x * W, sy1 = la.y * H;
     const sx2 = lb.x * W, sy2 = lb.y * H;
     const sx3 = lc.x * W, sy3 = lc.y * H;
-    // MP tessellation winds front-facing triangles clockwise in
-    // image space (y-down), which gives NEGATIVE signed area by the
-    // standard screen formula. So keep negative, skip positive.
+    // Build-time triangle enumeration does not enforce a consistent
+    // winding (we sort indices ascending), so signed-area sign is
+    // unreliable as a visibility test. Skip only degenerate slivers.
     const signedArea = (sx2 - sx1) * (sy3 - sy1) - (sx3 - sx1) * (sy2 - sy1);
-    if (signedArea >= 0) continue;
+    if (Math.abs(signedArea) < 2) continue;
 
     const uvA = anchors[ai].uv, uvB = anchors[bi].uv, uvC = anchors[ci].uv;
     if (!uvA || !uvB || !uvC) continue;
