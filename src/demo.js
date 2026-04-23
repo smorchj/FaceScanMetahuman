@@ -54,38 +54,19 @@ export async function start(opts) {
   const headBoneRestQuat = headBone ? headBone.quaternion.clone() : null;
   console.log('[demo] head bone:', headBone ? headBone.name : '(not found)');
 
-  // 3D projective texturing via per-vertex UVs:
-  //   - Back up the mesh's original UVs so we can restore them.
-  //   - Use the webcam as a VideoTexture and assign it to the face
-  //     skin material's .map.
-  //   - Each capture tick, recompute per-vertex UVs from an RBF that
-  //     maps anchor 3D rest positions to their current MP image
-  //     positions. Rasterizer then projects the webcam onto the
-  //     face via the mesh's own triangulation. Verts far from any
-  //     anchor keep their original UVs so Ada's texture stays for
-  //     scalp, neck, ears.
-  const uvAttr0 = skin.geometry.attributes.uv;
-  const originalUvArr = uvAttr0 ? new Float32Array(uvAttr0.array) : null;
-  const videoTex = new THREE.VideoTexture(video);
-  videoTex.colorSpace = THREE.SRGBColorSpace;
-  // flipY = false so UV.v = MP landmark y directly (MP's y is 0=top,
-  // 1=bottom, matching the unflipped texture convention).
-  videoTex.flipY = false;
-  videoTex.wrapS = videoTex.wrapT = THREE.ClampToEdgeWrapping;
-  const skinMat = Array.isArray(skin.material) ? skin.material[0] : skin.material;
-  const originalSkinMap = skinMat ? skinMat.map : null;
-  function setVideoMap() {
-    if (!skinMat) return;
-    skinMat.map = videoTex;
-    skinMat.needsUpdate = true;
-  }
-  function restoreOriginalMap() {
-    if (skinMat) { skinMat.map = originalSkinMap; skinMat.needsUpdate = true; }
-    if (originalUvArr && uvAttr0) {
-      uvAttr0.array.set(originalUvArr);
-      uvAttr0.needsUpdate = true;
-    }
-  }
+  // Accumulating face texture:
+  //   - Seed a canvas with Ada's existing skin base-color map.
+  //   - Each tick, paint the webcam chunk of every MP triangle that
+  //     is currently front-facing into the canvas at the UV positions
+  //     of that triangle's three anchors. Triangles not facing the
+  //     camera (user is turned away from them) are skipped, so their
+  //     previously-baked pixels stay untouched. Over a few seconds
+  //     of turning the user builds a complete face texture.
+  const faceTex = initFaceTexture(skin);
+  console.log('[demo] face texture size:', faceTex ? faceTex.size : '(skipped)');
+  // Webcam snapshot canvas reused every tick.
+  const sampleCanvas = document.createElement('canvas');
+  const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: false });
 
   // Snapshot rest positions for every head-adjacent mesh so the warp
   // can carry eyeballs, teeth, lashes, brows, and hair along with the
@@ -236,7 +217,6 @@ export async function start(opts) {
     }
     userRecent = [];
     userQuatRef = null;
-    setVideoMap();
     captureLoopId = setInterval(() => captureTick(), SAMPLE_INTERVAL_MS);
   }
 
@@ -260,21 +240,27 @@ export async function start(opts) {
       if (userRecent.length > USER_SMOOTH_N) userRecent.shift();
       const userAvg = averageLandmarks(userRecent);
 
-      // Calibrate once per capture: the user is assumed head-on at
-      // the moment of Start. Whatever quaternion MP reports then is
-      // the "baseline"; actual pose rotation is the delta from it.
-      // Without this the raw MP quaternion contains MP's own
-      // canonical-to-camera transform and applying it directly
-      // cranks Ada's neck.
-      const userQuat = rotationFromMatrix16(latestMatrix);
-      if (!userQuatRef) userQuatRef = userQuat.clone();
-      const userDeltaQuat = userQuatRef.clone().invert().premultiply(userQuat);
-      // MP's pitch axis points opposite to MH's pitch axis. Negating x
-      // on the delta flips pitch direction; leaves yaw and roll alone.
-      userDeltaQuat.x = -userDeltaQuat.x;
-      userDeltaQuat.normalize();
+      // MP facial-transformation -> head bone rotation.
+      // Standard pattern: decompose the matrix into YXZ Euler
+      // (yaw/pitch/roll), subtract the baseline captured at Start
+      // (user assumed roughly head-on), mirror yaw and pitch so the
+      // viewer's perspective matches the webcam (selfie-mirror), and
+      // recompose into a quaternion applied on top of the bone's
+      // local rest.
+      const mpMat = new THREE.Matrix4().fromArray(latestMatrix);
+      const eulerNow = new THREE.Euler().setFromRotationMatrix(mpMat, 'YXZ');
+      if (!userQuatRef) {
+        // Stash baseline Euler inside userQuatRef for reuse.
+        userQuatRef = eulerNow.clone();
+      }
+      const dPitch = eulerNow.x - userQuatRef.x;
+      const dYaw   = eulerNow.y - userQuatRef.y;
+      const dRoll  = eulerNow.z - userQuatRef.z;
+      // Mirror yaw (webcam is selfie-mirrored relative to the 3D view)
+      // and pitch (MP's canonical pitch sign is opposite three.js).
+      const deltaEuler = new THREE.Euler(-dPitch, -dYaw, dRoll, 'YXZ');
+      const userDeltaQuat = new THREE.Quaternion().setFromEuler(deltaEuler);
 
-      // Apply delta to Ada's head bone.
       if (headBone && headBoneRestQuat) {
         headBone.quaternion.copy(headBoneRestQuat).multiply(userDeltaQuat);
       }
@@ -291,14 +277,16 @@ export async function start(opts) {
       );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
 
-      // Project webcam onto the mesh via MP's canonical triangulation.
-      // Each face vertex sits inside one MP triangle; its UV is the
-      // barycentric blend of that triangle's 3 MP landmark webcam
-      // positions. Verts outside every triangle (i.e., not inside
-      // MP's face region) keep their original UV.
-      updateFaceUVsFromMpTriangles(
-        uvAttr0, originalUvArr,
-        cachedMpTriangles, cachedVertexContain, latest,
+      // Accumulating texture paint: for every MP triangle currently
+      // facing the camera, warp the webcam region bounded by its
+      // three MP landmarks into the UV region bounded by its three
+      // anchor UVs on a persistent canvas. Ada's original texture
+      // stays in the canvas where triangles haven't been painted yet,
+      // acting as the fallback.
+      paintFaceTextureMpTriangles(
+        faceTex, video, sampleCanvas, sampleCtx,
+        latest, userDeltaQuat,
+        cachedAnchors, cachedMpTriangles, cachedAdaLmRaw,
       );
 
       setStatus('capturing (pose-matched lattice)\n'
@@ -536,6 +524,65 @@ function bary2d(px, py, ax, ay, bx, by, cx, cy) {
   const b = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / denom;
   const c = 1 - a - b;
   return { a, b, c };
+}
+
+// Paint webcam into the persistent face-texture canvas, one MP
+// triangle at a time. Only triangles whose canonical normal, when
+// rotated by the user's head delta, points toward the camera
+// (+Z after rotation) are drawn. Accumulates across frames: as the
+// user turns, freshly-visible triangles overwrite; turned-away
+// triangles keep the pixels baked earlier.
+function paintFaceTextureMpTriangles(
+  faceTex, video, sampleCanvas, sampleCtx,
+  userLm, userDeltaQuat,
+  anchors, triangles, adaLmRaw,
+) {
+  if (!faceTex || !video.videoWidth || !triangles || !adaLmRaw) return;
+  if (sampleCanvas.width !== video.videoWidth
+   || sampleCanvas.height !== video.videoHeight) {
+    sampleCanvas.width = video.videoWidth;
+    sampleCanvas.height = video.videoHeight;
+  }
+  sampleCtx.drawImage(video, 0, 0);
+  const { ctx, size, texture } = faceTex;
+  const W = sampleCanvas.width, H = sampleCanvas.height;
+
+  const n1 = new THREE.Vector3();
+  const n2 = new THREE.Vector3();
+  const cross = new THREE.Vector3();
+
+  for (const tri of triangles) {
+    const mpA = tri[0], mpB = tri[1], mpC = tri[2];
+    const ai = tri[3], bi = tri[4], ci = tri[5];
+    const la = userLm[mpA], lb = userLm[mpB], lc = userLm[mpC];
+    if (!la || !lb || !lc) continue;
+
+    // Visibility via canonical normal rotated by user head delta.
+    const A = adaLmRaw[mpA], B = adaLmRaw[mpB], C = adaLmRaw[mpC];
+    n1.set(B.x - A.x, -(B.y - A.y), -(B.z - A.z));
+    n2.set(C.x - A.x, -(C.y - A.y), -(C.z - A.z));
+    cross.crossVectors(n1, n2).applyQuaternion(userDeltaQuat);
+    if (cross.z <= 0) continue;
+
+    // Secondary check: positive signed area in webcam (back-facing
+    // user landmarks have reversed winding).
+    const sx1 = la.x * W, sy1 = la.y * H;
+    const sx2 = lb.x * W, sy2 = lb.y * H;
+    const sx3 = lc.x * W, sy3 = lc.y * H;
+    const signedArea = (sx2 - sx1) * (sy3 - sy1) - (sx3 - sx1) * (sy2 - sy1);
+    if (signedArea <= 2) continue;
+
+    const uvA = anchors[ai].uv, uvB = anchors[bi].uv, uvC = anchors[ci].uv;
+    if (!uvA || !uvB || !uvC) continue;
+    const dx1 = uvA[0] * size, dy1 = (1 - uvA[1]) * size;
+    const dx2 = uvB[0] * size, dy2 = (1 - uvB[1]) * size;
+    const dx3 = uvC[0] * size, dy3 = (1 - uvC[1]) * size;
+
+    drawTriangleWarp(ctx, sampleCanvas,
+      sx1, sy1, sx2, sy2, sx3, sy3,
+      dx1, dy1, dx2, dy2, dx3, dy3);
+  }
+  texture.needsUpdate = true;
 }
 
 // Each frame: for each face vertex inside an MP triangle, set its UV
