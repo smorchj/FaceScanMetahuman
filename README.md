@@ -4,6 +4,24 @@ Turn a face scan into a MetaHuman in the browser. No pixel streaming,
 no cloud GPU, no native app install. Classical geometry and texture
 projection, wired to MediaPipe face tracking.
 
+## Live demo
+
+**https://smorchj.github.io/FaceScanMetahuman/demo.html**
+
+Grant webcam access, click Start capture, slowly turn your head. Ada
+will warp toward your proportions and the webcam projects onto her
+face. Stop to freeze the current snapshot. Works on desktop and
+mobile (iOS Safari and Android Chrome both support the required
+getUserMedia + WebGL over the Pages HTTPS).
+
+Other pages in the deployment:
+
+- **[/](https://smorchj.github.io/FaceScanMetahuman/)** — anchor
+  picker for building a per-character MH↔MP correspondence by hand.
+- **[/auto-anchors.html](https://smorchj.github.io/FaceScanMetahuman/auto-anchors.html)**
+  — automated variant that renders the MH, runs MediaPipe on the
+  render, and raycasts every landmark back into the mesh.
+
 ## Where this is going
 
 A single web page where a visitor points their phone or webcam at
@@ -12,42 +30,47 @@ watches a neutral MetaHuman warp into a likeness of them in real time.
 The output is a plain GLB that loads in three.js, Babylon, PlayCanvas,
 Unity WebGL, or anything that speaks glTF.
 
-Five building blocks, smallest to largest:
+Building blocks, in rough order of how complete they are:
 
-1. **Anchor picker** (this repo, today). A tool that lets an operator
-   click anatomical landmarks on a MetaHuman face mesh and exports the
-   vertex-index map. This is the MH-side half of the
-   MediaPipe-to-MetaHuman correspondence.
-2. **MediaPipe anchor map.** Same shape, different topology. For each
-   anatomical landmark name, the corresponding MediaPipe FaceLandmarker
-   index.
-3. **One-shot identity warp.** RBF deformation of the MH neutral mesh
-   from MediaPipe landmarks solved across a few captured angles. Apply
-   the same delta to every blendshape so the rig still fires.
-4. **Live texture bake.** Project webcam frames onto the MH face UV
-   through the solved head pose. Accumulate across frames, weight by
-   surface visibility.
-5. **Export.** Freeze the deformed mesh and baked texture, emit a GLB.
+1. **Anchor picker** — click anatomical landmarks on a MetaHuman face
+   mesh and export a vertex-index map.
+2. **Auto anchor map** — render the MH, run MediaPipe on that render,
+   raycast each of the 478 landmarks back into the skin mesh. Produces
+   a dense `anchors_auto.json`.
+3. **Identity warp** — pose-matched lattice warp. User's 478 MP
+   landmarks are rigid-aligned to Ada's pose-matched lattice, the
+   residual becomes the identity delta, unrotated to canonical and
+   scaled into MH metres by a one-shot MP→MH Procrustes. Applied to
+   every head-adjacent mesh with distance-weighted falloff so back of
+   head, neck, and ears keep their rest geometry.
+4. **Texture projection** — live webcam projected onto Ada's face via
+   per-vertex UV rewrite. Each face vertex samples the webcam pixel at
+   its corresponding MP landmark position via precomputed triangle
+   containment. On Stop the current frame is frozen into a
+   CanvasTexture so Ada keeps the snapshot while you orbit around.
+5. **Export** — freeze the deformed mesh and baked texture, emit a
+   GLB. Not done yet.
 
-## Run the anchor picker
+## Run locally
 
 You need a MetaHuman GLB (the companion
 [metahuman-to-glb](https://github.com/smorchj/metahuman-to-glb)
-pipeline produces one). Put it anywhere the static server can serve.
+pipeline produces one). Drop it at `samples/ada/ada.glb` together
+with its `mh_materials.json` and `textures/` folder (or pass paths
+via URL params).
 
 ```bash
-# Anywhere that serves static files works. Python is easiest:
 python -m http.server 8000
+# then open http://localhost:8000/demo.html
 ```
 
-Open `http://localhost:8000/?glb=path/to/metahuman.glb`. The picker
-cycles through 25 anatomical landmarks (midline plus left-side);
-the right-side twin is auto-mirrored across the face's local X=0 plane.
+URL params on `demo.html`:
 
-Output is `face_anchors.json` with 41 named entries (25 picked plus
-16 mirrored). All entries reference a single skin mesh: the tool
-constrains picks to the largest face sub-mesh it finds (the MH skin
-in every version I've tested).
+- `?glb=path/to/character.glb` (default `samples/ada/ada.glb`)
+- `?materials=path/to/mh_materials.json` (default `samples/ada/mh_materials.json`)
+- `?anchors=path/to/anchors.json` (optional seed file; first Start
+  rebuilds a dense map anyway)
+- `?id=character_name` (default `ada`)
 
 ## Picker output schema
 
@@ -67,13 +90,15 @@ in every version I've tested).
 ```
 
 `restPosition` is the geometry-local position of the vertex in the
-mesh's bind pose. It is a convenience for consumers; the load of
-truth is `vertexIndex` into the named mesh's position attribute.
+mesh's bind pose. It's a convenience for consumers; the load-of-truth
+is `vertexIndex` into the named mesh's position attribute.
 
 ## Status
 
-Stage 1 works. The picker has been validated against Ada from the
-MetaHuman sample set. Stage 2 is next.
+Mesh warp + live texture projection work end-to-end in the browser.
+Quality is rough (RGB-only depth, no delighting, no temporal accumulation
+of texture yet), but the pipeline is correct and the architecture
+holds. Snapshot + export steps are next.
 
 ## License
 
