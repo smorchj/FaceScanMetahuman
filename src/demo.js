@@ -54,19 +54,32 @@ export async function start(opts) {
   const headBoneRestQuat = headBone ? headBone.quaternion.clone() : null;
   console.log('[demo] head bone:', headBone ? headBone.name : '(not found)');
 
-  // Accumulating face texture:
-  //   - Seed a canvas with Ada's existing skin base-color map.
-  //   - Each tick, paint the webcam chunk of every MP triangle that
-  //     is currently front-facing into the canvas at the UV positions
-  //     of that triangle's three anchors. Triangles not facing the
-  //     camera (user is turned away from them) are skipped, so their
-  //     previously-baked pixels stay untouched. Over a few seconds
-  //     of turning the user builds a complete face texture.
-  const faceTex = initFaceTexture(skin);
-  console.log('[demo] face texture size:', faceTex ? faceTex.size : '(skipped)');
-  // Webcam snapshot canvas reused every tick.
-  const sampleCanvas = document.createElement('canvas');
-  const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: false });
+  // Live webcam projection onto Ada's face via per-vertex UV rewrite.
+  // Material.map becomes a VideoTexture; every tick we replace the
+  // geometry UVs so each face vertex samples its corresponding pixel
+  // of the user's webcam via MP triangle correspondence. Verts outside
+  // the MP face region keep their original UV so Ada's map stays
+  // for neck / ears / scalp.
+  const uvAttr0 = skin.geometry.attributes.uv;
+  const originalUvArr = uvAttr0 ? new Float32Array(uvAttr0.array) : null;
+  const videoTex = new THREE.VideoTexture(video);
+  videoTex.colorSpace = THREE.SRGBColorSpace;
+  videoTex.flipY = false; // UV.v = MP.y directly (0 top, 1 bottom)
+  videoTex.wrapS = videoTex.wrapT = THREE.ClampToEdgeWrapping;
+  const skinMat = Array.isArray(skin.material) ? skin.material[0] : skin.material;
+  const originalSkinMap = skinMat ? skinMat.map : null;
+  function useVideoMap() {
+    if (!skinMat) return;
+    skinMat.map = videoTex;
+    skinMat.needsUpdate = true;
+  }
+  function restoreOriginalMap() {
+    if (skinMat) { skinMat.map = originalSkinMap; skinMat.needsUpdate = true; }
+    if (originalUvArr && uvAttr0) {
+      uvAttr0.array.set(originalUvArr);
+      uvAttr0.needsUpdate = true;
+    }
+  }
 
   // Snapshot rest positions for every head-adjacent mesh so the warp
   // can carry eyeballs, teeth, lashes, brows, and hair along with the
@@ -231,6 +244,7 @@ export async function start(opts) {
     }
     userRecent = [];
     userQuatRef = null;
+    useVideoMap();
     captureLoopId = setInterval(() => captureTick(), SAMPLE_INTERVAL_MS);
   }
 
@@ -294,16 +308,13 @@ export async function start(opts) {
       );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
 
-      // Accumulating texture paint: for every MP triangle currently
-      // facing the camera, warp the webcam region bounded by its
-      // three MP landmarks into the UV region bounded by its three
-      // anchor UVs on a persistent canvas. Ada's original texture
-      // stays in the canvas where triangles haven't been painted yet,
-      // acting as the fallback.
-      paintFaceTextureMpTriangles(
-        faceTex, video, sampleCanvas, sampleCtx,
-        latest, userDeltaQuat,
-        cachedAnchors, cachedMpTriangles, cachedAdaLmRaw,
+      // Rewrite per-vertex UVs so each face vertex samples its
+      // corresponding pixel of the user's webcam via MP triangle
+      // correspondence. The rasterizer then projects the webcam
+      // onto Ada's face through her own mesh triangulation.
+      updateFaceUVsFromMpTriangles(
+        uvAttr0, originalUvArr,
+        cachedMpTriangles, cachedVertexContain, latest,
       );
 
       setStatus('capturing (pose-matched lattice)\n'
