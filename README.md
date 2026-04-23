@@ -1,8 +1,8 @@
 # FaceScanMetahuman
-
+WIP
 Turn a face scan into a MetaHuman in the browser. No pixel streaming,
 no cloud GPU, no native app install. Classical geometry and texture
-projection, wired to MediaPipe face tracking.
+projection, wired to MediaPipe face tracking. WIP
 
 ## Live demo
 
