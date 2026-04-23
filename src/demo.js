@@ -68,7 +68,9 @@ export async function start(opts) {
   const originalUvArr = uvAttr0 ? new Float32Array(uvAttr0.array) : null;
   const videoTex = new THREE.VideoTexture(video);
   videoTex.colorSpace = THREE.SRGBColorSpace;
-  videoTex.flipY = true;
+  // flipY = false so UV.v = MP landmark y directly (MP's y is 0=top,
+  // 1=bottom, matching the unflipped texture convention).
+  videoTex.flipY = false;
   videoTex.wrapS = videoTex.wrapT = THREE.ClampToEdgeWrapping;
   const skinMat = Array.isArray(skin.material) ? skin.material[0] : skin.material;
   const originalSkinMap = skinMat ? skinMat.map : null;
@@ -201,7 +203,8 @@ export async function start(opts) {
   let captureLoopId = null;
   let cachedMpToMh = null;           // rigid+scale MP canonical -> MH rest
   let cachedAdaLmRaw = null;         // Ada's 478 landmarks (head-on)
-  let cachedTriangles = null;        // array of [a,b,c] anchor-index triples
+  let cachedMpTriangles = null;      // MP's canonical triangulation: [[mpA, mpB, mpC], ...]
+  let cachedVertexContain = null;    // per face-mesh vertex: {tri, a, b, c} or null
   const USER_SMOOTH_N = 6;           // running-average window for user lattice
   let userRecent = [];               // array of raw user 478-landmark arrays
   let userQuatRef = null;            // user head quat at start, = "head-on" baseline
@@ -216,7 +219,20 @@ export async function start(opts) {
       cachedMpToMh     = built.mpToMh;
       cachedAdaLmRaw   = built.adaLandmarksRaw;
       cachedFovDeg     = HARDCODED_FOV;
-      setStatus('anchors: ' + cachedAnchors.length + '. capturing live...');
+      // Build MP's canonical triangulation from its edge list, then
+      // keep only triangles whose 3 MP indices all exist as anchors.
+      const tess = imgLandmarker.constructor.FACE_LANDMARKS_TESSELATION
+                || landmarker.constructor.FACE_LANDMARKS_TESSELATION;
+      cachedMpTriangles = buildMpTriangles(tess, cachedAnchors);
+      // Precompute per-face-vertex containment in MP triangle space.
+      setStatus('precomputing triangle containment...');
+      cachedVertexContain = precomputeVertexContainment(
+        skin, cachedAnchors, cachedMpTriangles,
+      );
+      const covered = cachedVertexContain.filter(Boolean).length;
+      setStatus('anchors: ' + cachedAnchors.length
+        + ', MP triangles: ' + cachedMpTriangles.length
+        + ', covered face verts: ' + covered + '. capturing live...');
     }
     userRecent = [];
     userQuatRef = null;
@@ -275,15 +291,14 @@ export async function start(opts) {
       );
       const stats = runWarpFromTargets(targets, cachedAnchors, warpTargets);
 
-      // Project webcam onto the mesh by rewriting per-vertex UVs.
-      // The 478 MP landmarks give us an exact 3D→2D correspondence
-      // for each anchor; RBF smooths between anchors so every face
-      // vertex gets a valid sample coord. Verts too far from any
-      // anchor (scalp, neck, ears) keep their original UV so Ada's
-      // own texture stays there.
-      updateFaceUVsFromLattice(
-        skin, uvAttr0, originalUvArr,
-        cachedAnchors, latest,
+      // Project webcam onto the mesh via MP's canonical triangulation.
+      // Each face vertex sits inside one MP triangle; its UV is the
+      // barycentric blend of that triangle's 3 MP landmark webcam
+      // positions. Verts outside every triangle (i.e., not inside
+      // MP's face region) keep their original UV.
+      updateFaceUVsFromMpTriangles(
+        uvAttr0, originalUvArr,
+        cachedMpTriangles, cachedVertexContain, latest,
       );
 
       setStatus('capturing (pose-matched lattice)\n'
@@ -401,12 +416,118 @@ function anchorFacesCamera(anchor, userQuat, cachedAdaLmRaw) {
   return v.z > 0.01;
 }
 
-// Rewrite each face vertex's UV so it samples the webcam pixel that
-// geometrically corresponds to its spot on Ada's face. An RBF
-// interpolates between the 478 anchor correspondences so every vertex
-// inside the face region gets a valid sample coord. Verts beyond
-// FACE_REACH (metres) from any anchor keep their original UV so
-// Ada's own map shows through on neck, ears, back of head.
+// Enumerate triangles from MediaPipe's tesselation edge list. Keep
+// only those whose 3 MP indices all appear as anchors (so we have
+// a valid MH correspondence for every vertex of the triangle).
+// Returns array of [mpA, mpB, mpC, anchorA, anchorB, anchorC].
+function buildMpTriangles(tessConnections, anchors) {
+  if (!tessConnections) return [];
+  const mpToAnchorIdx = new Map();
+  anchors.forEach((a, i) => mpToAnchorIdx.set(a.mpIdx, i));
+
+  const adj = new Map();
+  for (const c of tessConnections) {
+    const s = c.start, e = c.end;
+    if (!adj.has(s)) adj.set(s, new Set());
+    if (!adj.has(e)) adj.set(e, new Set());
+    adj.get(s).add(e);
+    adj.get(e).add(s);
+  }
+  const seen = new Set();
+  const out = [];
+  for (const v of adj.keys()) {
+    const neigh = Array.from(adj.get(v));
+    for (let i = 0; i < neigh.length; i++) {
+      const a = neigh[i]; if (a <= v) continue;
+      for (let j = i + 1; j < neigh.length; j++) {
+        const b = neigh[j]; if (b <= a) continue;
+        if (!adj.get(a).has(b)) continue;
+        const ai = mpToAnchorIdx.get(v);
+        const bi = mpToAnchorIdx.get(a);
+        const ci = mpToAnchorIdx.get(b);
+        if (ai === undefined || bi === undefined || ci === undefined) continue;
+        const key = v + ',' + a + ',' + b;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push([v, a, b, ai, bi, ci]);
+      }
+    }
+  }
+  return out;
+}
+
+// For each face-mesh vertex, find the MP triangle that contains its
+// rest XY position (faces are front-facing enough that XY projection
+// identifies the right triangle). Returns array of {tri, a, b, c} or
+// null per vertex.
+function precomputeVertexContainment(skin, anchors, mpTriangles) {
+  const posAttr = skin.geometry.attributes.position;
+  const n = posAttr.count;
+  const result = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const px = posAttr.getX(i);
+    const py = posAttr.getY(i);
+    let best = null;
+    let bestBias = Infinity;
+    for (let t = 0; t < mpTriangles.length; t++) {
+      const tri = mpTriangles[t];
+      const A = anchors[tri[3]].mhRest;
+      const B = anchors[tri[4]].mhRest;
+      const C = anchors[tri[5]].mhRest;
+      const bary = bary2d(px, py, A[0], A[1], B[0], B[1], C[0], C[1]);
+      if (!bary) continue;
+      // Slack so sliver triangles at the silhouette catch verts a
+      // hair outside their boundary.
+      const minAxis = Math.min(bary.a, bary.b, bary.c);
+      if (minAxis >= -0.002 && bary.a <= 1.002 && bary.b <= 1.002 && bary.c <= 1.002) {
+        // If multiple triangles contain this vertex, pick the one
+        // whose barycentric coords are most "interior" (farthest
+        // from any edge).
+        const bias = -minAxis;
+        if (bias < bestBias) {
+          bestBias = bias;
+          best = { tri: t, a: bary.a, b: bary.b, c: bary.c };
+        }
+      }
+    }
+    result[i] = best;
+  }
+  return result;
+}
+
+function bary2d(px, py, ax, ay, bx, by, cx, cy) {
+  const denom = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
+  if (Math.abs(denom) < 1e-14) return null;
+  const a = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / denom;
+  const b = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / denom;
+  const c = 1 - a - b;
+  return { a, b, c };
+}
+
+// Each frame: for each face vertex inside an MP triangle, set its UV
+// to the barycentric blend of that triangle's 3 MP landmark webcam
+// positions. Verts outside every MP triangle keep their original UV.
+function updateFaceUVsFromMpTriangles(uvAttr, origUv, triangles, containment, userLm) {
+  if (!uvAttr || !origUv || !triangles || !containment) return;
+  const arr = uvAttr.array;
+  for (let i = 0; i < containment.length; i++) {
+    const c = containment[i];
+    if (!c) {
+      arr[i * 2 + 0] = origUv[i * 2 + 0];
+      arr[i * 2 + 1] = origUv[i * 2 + 1];
+      continue;
+    }
+    const tri = triangles[c.tri];
+    const la = userLm[tri[0]];
+    const lb = userLm[tri[1]];
+    const lc = userLm[tri[2]];
+    arr[i * 2 + 0] = c.a * la.x + c.b * lb.x + c.c * lc.x;
+    arr[i * 2 + 1] = c.a * la.y + c.b * lb.y + c.c * lc.y;
+  }
+  uvAttr.needsUpdate = true;
+}
+
+// Legacy RBF-based UV update, kept for comparison. Not called.
 function updateFaceUVsFromLattice(skin, uvAttr, origUv, anchors, userLm) {
   if (!uvAttr || !origUv) return;
   const FACE_REACH = 0.04;
