@@ -202,9 +202,13 @@ export async function start(opts) {
       cachedFovDeg     = HARDCODED_FOV;
       // Build MP's canonical triangulation from its edge list, then
       // keep only triangles whose 3 MP indices all exist as anchors.
-      const tess = imgLandmarker.constructor.FACE_LANDMARKS_TESSELATION
-                || landmarker.constructor.FACE_LANDMARKS_TESSELATION;
+      const tess = FaceLandmarker.FACE_LANDMARKS_TESSELATION
+                || imgLandmarker.constructor.FACE_LANDMARKS_TESSELATION
+                || landmarker.constructor.FACE_LANDMARKS_TESSELATION
+                || vision.FaceLandmarker && vision.FaceLandmarker.FACE_LANDMARKS_TESSELATION;
+      console.log('[demo] MP tessellation edges:', tess ? tess.length : '(not found)');
       cachedMpTriangles = buildMpTriangles(tess, cachedAnchors);
+      console.log('[demo] MP triangles (fully anchored):', cachedMpTriangles.length);
       // Precompute per-face-vertex containment in MP triangle space.
       setStatus('precomputing triangle containment...');
       cachedVertexContain = precomputeVertexContainment(
@@ -582,6 +586,11 @@ function paintFaceTextureMpTriangles(
     drawTriangleWarp(ctx, sampleCanvas,
       sx1, sy1, sx2, sy2, sx3, sy3,
       dx1, dy1, dx2, dy2, dx3, dy3);
+    painted++;
+  }
+  if (!paintFaceTextureMpTriangles._n) paintFaceTextureMpTriangles._n = 0;
+  if (paintFaceTextureMpTriangles._n++ % 13 === 0) {
+    console.log('[demo] paint tick: painted', painted, 'of', triangles.length);
   }
   texture.needsUpdate = true;
 }
