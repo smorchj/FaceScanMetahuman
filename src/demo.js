@@ -199,7 +199,7 @@ export async function start(opts) {
   let cachedAdaLmRaw = null;         // Ada's 478 landmarks (head-on)
   let cachedMpTriangles = null;      // MP's canonical triangulation: [[mpA, mpB, mpC], ...]
   let cachedVertexContain = null;    // per face-mesh vertex: {tri, a, b, c} or null
-  const USER_SMOOTH_N = 6;           // running-average window for user lattice
+  const USER_SMOOTH_N = 120;         // running-average window for user lattice
   let userRecent = [];               // array of raw user 478-landmark arrays
   let userQuatRef = null;            // user head quat at start, = "head-on" baseline
 
@@ -256,9 +256,27 @@ export async function start(opts) {
     if (headBone && headBoneRestQuat) {
       headBone.quaternion.copy(headBoneRestQuat);
     }
-    restoreOriginalMap();
+    // Snapshot: freeze the current webcam frame into a CanvasTexture
+    // and leave the rewritten UVs in place. Ada now shows a static
+    // projection of the instant you stopped instead of reverting to
+    // her original map.
+    freezeFaceTexture();
     captureBtn.textContent = 'Start capture';
-    setStatus('capture stopped.');
+    setStatus('capture stopped (snapshot frozen).');
+  }
+
+  function freezeFaceTexture() {
+    if (!video.videoWidth || !skinMat) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.flipY = false;
+    tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+    skinMat.map = tex;
+    skinMat.needsUpdate = true;
   }
 
   async function captureTick() {
